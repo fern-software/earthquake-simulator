@@ -13,6 +13,7 @@ set(CMAKE_CXX_STANDARD 20)
 include(Sanitizers.cmake)
 
 find_package(Catch2 REQUIRED)
+find_package(Boost REQUIRED)
 
 option(ENABLE_COVERAGE, "This enables coverage information provided by Lcov" false)
 if (ENABLE_COVERAGE)
@@ -22,17 +23,18 @@ if (ENABLE_COVERAGE)
 endif()
 
 # executables
-# TODO: change this
-add_executable(test_random app/test_random.cpp)
-target_link_libraries(test_random ra Catch2::Catch2)
+add_executable(earthquake app/earthquake.cpp)
+add_executable(test_earthquake app/test_earthquake.cpp)
+target_link_libraries(earthquake game Boost::Boost)
+target_link_libraries(test_earthquake game Catch2::Catch2)
 
 # coverage task that runs tests
 if (ENABLE_COVERAGE)
 	SETUP_TARGET_FOR_COVERAGE_LCOV(
 		NAME coverage
-		EXECUTABLE ${CMAKE_CURRENT_BINARY_DIR}/test_random # TODO: change this
+		EXECUTABLE ${CMAKE_CURRENT_BINARY_DIR}/test_earthquake
 		LCOV_ARGS -rc lcov_branch_coverage=1
 		GENHTML_ARGS --branch-coverage
-		DEPENDENCIES test_random # TODO: change this
+		DEPENDENCIES test_earthquake
 	)
 endif()
