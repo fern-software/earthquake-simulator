@@ -24,6 +24,7 @@ public:
 	}
 
 private:
+	template <class T> friend class Joint;
 	Point pos_;
 	Vector prev_pos_;
 	Vector a_;
