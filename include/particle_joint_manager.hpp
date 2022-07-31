@@ -20,12 +20,12 @@ namespace game {
             void update();
 
             // Adds a particle to the simulation
-            void addParticle(physics::Particle<T>&& particle) {
+            void addParticle(physics::Particle<T> particle) {
                 particles.push_back(particle);
             }
 
             // Adds a joint to the simulation
-            void addJoint(physics::Joint<T>&& joint) {
+            void addJoint(physics::Joint<T> joint) {
                 joints.push_back(joint);
             }
 

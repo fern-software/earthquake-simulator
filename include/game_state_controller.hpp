@@ -105,9 +105,10 @@ namespace game {
                     physics::Particle<float>::Point(10, 10)
                 ));
                 point_manager.addJoint(physics::Joint<float>(
-                    physics::Particle<float>::Point(5, 5),
-                    physics::Joint<float>::Point(10, 10)
+                    point_manager.getParticles()[0],
+                    point_manager.getParticles()[1]
                 ));
+                
                 main_loop();
             }
             ~GameStateController() = default;
