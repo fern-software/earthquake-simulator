@@ -13,12 +13,20 @@ public:
 	using Point = CGAL::Point_2<Cartesian<T>>;
 	using Vector = CGAL::Vector_2<Cartesian<T>>;
 	
-	Particle(T x, T y) : position_(Point(x, y)), prev_position_(Point(x, y)){}
+	// Constructs a particle at the given position (pos) which is subjet to the given acceleration (a).
+	Particle(Point pos, Vector a = Vector(0, 0)) : pos_(pos), prev_pos_(pos, a_(a)){}
+
+	// Updates the position of the particle using Verlet Integration.
+	void update(T dt){
+		Point tmp = pos_;
+		pos_ += (pos_ - prev_pos_) + (a_ * dt * dt);
+		prev_pos_ = tmp;
+	}
 
 private:
-	Point position_;
-	Vector prev_position_;
-	Vector acceleration_;
+	Point pos_;
+	Vector prev_pos_;
+	Vector a_;
 };
 
 }
