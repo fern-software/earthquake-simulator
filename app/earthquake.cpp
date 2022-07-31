@@ -1,9 +1,7 @@
 #include "game_state_controller.hpp"
 
-namespace game {
-    // Main
-    int main(int argc, char** argv) {
-        GameStateController game_state_controller;
-        return 0;
-    }
+// Main
+int main(int argc, char** argv) {
+    game::GameStateController game_state_controller(argc, argv);
+    return 0;
 }
