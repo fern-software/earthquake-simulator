@@ -7,13 +7,18 @@
 
 
 namespace game {
-    typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, Point<double>> Graph;
+    typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, Point> Graph;
     class PointManager {
         public:
-            PointManager();
-            ~PointManager();
+            PointManager(): graph(Graph()) {}
+
+            ~PointManager() = default;
+
             // Updates the position of all points in the simulation
             void update();
+
+            // Add a point to the graph
+            void add_point(Point point);
         private:
             Graph graph;
     };

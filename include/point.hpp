@@ -1,25 +1,17 @@
 #pragma once
 
+#include <CGAL/Cartesian.h>
 #include <CGAL/Point_2.h>
+
+typedef CGAL::Point_2<CGAL::Cartesian<double>> CGAL_Point_2;
 
 
 // Extend CGAL::Point_2 to include a mass and acceleration
-template <typename T>
-class Point : public CGAL::Point_2<T> {
+class Point : public CGAL::Point_2<CGAL::Cartesian<double>> {
 	public:
-		Point(T x, T y, T mass) : CGAL::Point_2<T>(x, y), mass_(mass), accel_x_(0), accel_y_(0) {}
+		Point(double x, double y, double mass) : CGAL::Point_2<CGAL::Cartesian<double>>(x, y), mass_(mass), accel_x_(0), accel_y_(0) {}
 	private:
-		T mass_;
-		T accel_x_;
-		T accel_y_;
+		double mass_;
+		double accel_x_;
+		double accel_y_;
 };
-// template<typename T> class Point : public CGAL::Point_2<T> {
-// public:
-// 	// initializes a point with the given coordinates, a mass, and an acceleration of 0
-// 	Point(T x, T y, T mass) : CGAL::Point_2<T>(x, y), mass_(mass), accel_x_(0), accel_y(0){}
-
-// private:
-// 	T mass_;
-// 	T accel_x_;
-// 	T accel_y_;
-// };

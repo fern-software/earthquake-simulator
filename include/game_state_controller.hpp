@@ -1,6 +1,7 @@
 #pragma once
 #include <GL/glew.h>
 #include <GL/glut.h>
+#include <GL/glu.h>
 #include <iostream>
 #include <string>
 #include "point_manager.hpp"
@@ -22,7 +23,7 @@ namespace game {
                 }
 
             }
-            ~GameStateController();
+            ~GameStateController() = default;
             
         private:
             void initGL() {
