@@ -8,7 +8,10 @@
 #include <string>
 #include <exception>
 #include <chrono>
-#include "point_manager.hpp"
+#include <vector>
+#include "particle_joint_manager.hpp"
+#include "particle.hpp"
+#include "joint.hpp"
 
 #define PIXEL_FORMAT GL_RGB
 #define WIDTH 640
@@ -39,7 +42,7 @@ namespace game {
                     glfwSetWindowShouldClose(window, GL_TRUE);
             }
 
-            void render() {
+            void render(std::vector<physics::Particle<float>> particles, std::vector <physics::Joint<float>> joints) {
                 glClear(GL_COLOR_BUFFER_BIT);
                 int width, height;
                 glfwGetFramebufferSize(window, &width, &height);
@@ -50,7 +53,6 @@ namespace game {
                 glMatrixMode(GL_MODELVIEW);
                 glLoadIdentity();
                 glOrtho(-ratio, ratio, -1.f, 1.f, 1.f, -1.f);
-                glRotatef((float)glfwGetTime() * 50.f, 0.f, 0.f, 1.f);
                 glBegin(GL_TRIANGLES);
                 glColor3f(1.f, 0.f, 0.f);
                 glVertex3f(-0.6f, -0.4f, 0.f);
@@ -94,10 +96,18 @@ namespace game {
     class GameStateController {
         public:
             // Create empty point manager and initialize openGL window
-            GameStateController(int argc, char* argv[]): point_manager(PointManager()), ui_controller(UIController(argc, argv)) {
-                // Start GLUT main loop
-                // glutTimerFunc( 1000 / FPS, static_loop, 0 );
-                // glutMainLoop();
+            GameStateController(int argc, char* argv[]): point_manager(ParticleJointManager<float>()), ui_controller(UIController(argc, argv)) {
+                // Add dummy particles and joints
+                point_manager.addParticle(physics::Particle<float>(
+                    physics::Particle<float>::Point(5, 5)
+                ));
+                point_manager.addParticle(physics::Particle<float>(
+                    physics::Particle<float>::Point(10, 10)
+                ));
+                point_manager.addJoint(physics::Joint<float>(
+                    physics::Particle<float>::Point(5, 5),
+                    physics::Joint<float>::Point(10, 10)
+                ));
                 main_loop();
             }
             ~GameStateController() = default;
@@ -115,7 +125,7 @@ namespace game {
                         a = b;
                         update_game_state();
                     }
-                    ui_controller.render();
+                    ui_controller.render(point_manager.getParticles(), point_manager.getJoints());
                     glfwPollEvents();
                     
                 }
@@ -124,7 +134,7 @@ namespace game {
             // Called every frame
             static void update_game_state(){}
 
-            PointManager point_manager;
+            ParticleJointManager<float> point_manager;
             UIController ui_controller;
     };
 }

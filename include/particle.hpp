@@ -1,17 +1,18 @@
 #pragma once
 
+#include <CGAL/Cartesian.h>
 #include <CGAL/Point_2.h>
 #include <CGAL/Vector_2.h>
 
 namespace physics {
 
 // Represents a 2D particle who's position is updated using Verlet Integration.
-// As of now there is no support for particle's of different masses but that
+// As of now there is no support for particles of different masses but that
 // could be added in the future, without much difficulty.
 template <class T> class Particle {
 public:
-	using Point = CGAL::Point_2<Cartesian<T>>;
-	using Vector = CGAL::Vector_2<Cartesian<T>>;
+	using Point = CGAL::Point_2<CGAL::Cartesian<T>>;
+	using Vector = CGAL::Vector_2<CGAL::Cartesian<T>>;
 	
 	// Constructs a particle at the given position (pos) which is subjet to the given acceleration (a).
 	Particle(Point pos, Vector a = Vector(0, 0)) : pos_(pos), prev_pos_(pos, a_(a)){}
@@ -24,7 +25,7 @@ public:
 	}
 
 private:
-	template <class T> friend class Joint;
+	template <class U> friend class Joint;
 	Point pos_;
 	Vector prev_pos_;
 	Vector a_;

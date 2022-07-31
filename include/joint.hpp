@@ -12,8 +12,8 @@ public:
 	// The particle type used by the joint. Its important that its a reference type as a 
 	// joint never owns a particle as many joints may be connected to the same particle.
 	using ParticleType = Particle<T>&;
-	using Point = typename ParticleType::Point;
-	using Vector = typename ParticleType::Vector;
+	using Point = typename Particle<T>::Point;
+	using Vector = typename Particle<T>::Vector;
 
 	// Constructs a joint between the given particles. The length of the joint is set to
 	// the distance between the two particles at the time of creation.
@@ -31,8 +31,8 @@ public:
 		T diff = (distance - length_) / distance;
 
 		// updates the position of the particles
-		p1.pos_ -= delta * 0.5 * diff;
-		p2.pos_ += delta * 0.5 * diff;
+		p1_.pos_ -= delta * 0.5 * diff;
+		p2_.pos_ += delta * 0.5 * diff;
 	}
 
 private:
