@@ -42,6 +42,13 @@ namespace game {
                     glfwSetWindowShouldClose(window, GL_TRUE);
             }
 
+            void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+                if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS){
+                    
+                }
+                    
+            }
+
             void render(std::vector<physics::Particle<float>> particles, std::vector <physics::Joint<float>> joints) {
                 glClear(GL_COLOR_BUFFER_BIT);
                 int width, height;
@@ -61,11 +68,11 @@ namespace game {
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                 glEnable( GL_POINT_SMOOTH );
                 glPointSize( 8.0 );
+
                 glBegin(GL_POINTS);
                 for (auto& particle : particles) {
                     glColor3f(1.0f, 0.0f, 0.0f);
                     glVertex2f(particle.x(), particle.y());
-                    // std::cout << "Particle: " << particle.pos().x() << " " << particle.pos().y() << std::endl;
                 }
                 glEnd();
                 glDisable(GL_POINT_SMOOTH);
@@ -100,6 +107,7 @@ namespace game {
 
                 glfwMakeContextCurrent(window);
                 glfwSetKeyCallback(window, key_callback);
+                glfwSetMouseButtonCallback(window, mouse_button_callback);
             }
 
             // Should close the window?
@@ -115,7 +123,9 @@ namespace game {
     class GameStateController {
         public:
             // Create empty point manager and initialize openGL window
-            GameStateController(int argc, char* argv[]): point_manager(ParticleJointManager<float>()), ui_controller(UIController(argc, argv)) {
+            GameStateController(int argc, char* argv[]): point_manager(ParticleJointManager<float>()), 
+                                                         ui_controller(UIController(argc, argv)),
+                                                         simulation_running(false) {
                 // Add dummy particles and joints
                 point_manager.addParticle(physics::Particle<float>(
                     50, 50, // Position
@@ -156,9 +166,13 @@ namespace game {
             // Called every 1/FPS seconds
             void update_game_state(){
                 // Update particles and joints
-                point_manager.update();
+                // Calculates physics only when the simulation is running
+                if (simulation_running) {
+                    point_manager.update();
+                }
             }
 
+            bool simulation_running;
             ParticleJointManager<float> point_manager;
             UIController ui_controller;
     };

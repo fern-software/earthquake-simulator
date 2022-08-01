@@ -24,6 +24,17 @@ namespace game {
                 // TODO: Joints
             }
 
+            // Find particle at a given position
+            // If this is too slow use a hashtable or something
+            physics::Particle<T>* particleAt(const double x, const double y) const {
+                for (auto& particle : particles) {
+                    if (particle.x() == x && particle.y() == y) {
+                        return &particle;
+                    }
+                }
+                return nullptr;
+            }
+
             // Adds a particle to the simulation
             void addParticle(physics::Particle<T> particle) {
                 particles.push_back(particle);
