@@ -15,7 +15,7 @@ public:
 	using Vector = CGAL::Vector_2<CGAL::Cartesian<T>>;
 	
 	// Constructs a particle at the given position which is subjet to the given acceleration.
-	Particle(T x, T y, T ax, T ay) : pos_(Point(x, y)), prev_pos_(Point(x, y)), a_(Vector(ax, ay)){}
+	Particle(T x, T y, Vector a) : pos_(Point(x, y)), prev_pos_(Point(x, y)), a_(a){}
 
 	// Updates the position of the particle using Verlet Integration.
 	void update(T dt){
