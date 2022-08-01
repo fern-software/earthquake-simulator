@@ -4,15 +4,12 @@ set(CMAKE_VERBOSE_MAKEFILE true)
 
 # enable pedantic errors and set warnings to all
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic-errors")
 
 # set standard
 set(CMAKE_CXX_STANDARD 20)
 
 # coverage, testing, and sanitizer options
 include(Sanitizers.cmake)
-
-find_package(Catch2 REQUIRED)
 
 option(ENABLE_COVERAGE, "This enables coverage information provided by Lcov" false)
 if (ENABLE_COVERAGE)
@@ -21,18 +18,34 @@ if (ENABLE_COVERAGE)
 	APPEND_COVERAGE_COMPILER_FLAGS()
 endif()
 
+find_package(Catch2 REQUIRED)
+find_package(Boost REQUIRED COMPONENTS graph)
+find_package(OpenGL REQUIRED)
+find_package(GLEW REQUIRED)
+find_package(glfw3 REQUIRED)
+
+include_directories(${OPENGL_INCLUDE_DIR})
+
+
 # executables
-# TODO: change this
-add_executable(test_random app/test_random.cpp)
-target_link_libraries(test_random ra Catch2::Catch2)
+add_executable(earth app/earthquake.cpp)
+add_executable(test_earthquake app/test_earthquake.cpp)
+
+target_include_directories(earth PUBLIC ${Boost_INCLUDE_DIRS} include)
+target_include_directories(test_earthquake PUBLIC ${Boost_INCLUDE_DIRS} include)
+
+target_link_libraries(earth Boost::graph OpenGL::GL OpenGL::GLU GLEW::GLEW glfw)
+target_link_libraries(test_earthquake PUBLIC Catch2::Catch2)
+
+
 
 # coverage task that runs tests
 if (ENABLE_COVERAGE)
 	SETUP_TARGET_FOR_COVERAGE_LCOV(
 		NAME coverage
-		EXECUTABLE ${CMAKE_CURRENT_BINARY_DIR}/test_random # TODO: change this
+		EXECUTABLE ${CMAKE_CURRENT_BINARY_DIR}/test_earthquake
 		LCOV_ARGS -rc lcov_branch_coverage=1
 		GENHTML_ARGS --branch-coverage
-		DEPENDENCIES test_random # TODO: change this
+		DEPENDENCIES test_earthquake
 	)
 endif()
