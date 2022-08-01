@@ -24,6 +24,14 @@ public:
 		prev_pos_ = tmp;
 	}
 
+	// Moves the particle by the given vector (v).
+	// void move(Vector v){
+	// 	pos_ += v;
+	// }
+
+	// Returns the position of the particle.
+	Point pos() const { return pos_; }
+
 private:
 	template <class U> friend class Joint;
 	Point pos_;

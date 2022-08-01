@@ -17,7 +17,12 @@ namespace game {
             ~ParticleJointManager() = default;
 
             // Updates the position of all points in the simulation
-            void update();
+            void update() {
+                for (auto& particle : particles) {
+                    particle.update(0.5f);
+                }
+                // TODO: Joints
+            }
 
             // Adds a particle to the simulation
             void addParticle(physics::Particle<T> particle) {

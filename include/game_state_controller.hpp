@@ -50,17 +50,36 @@ namespace game {
                 glViewport(0, 0, width, height);
                 glMatrixMode(GL_PROJECTION);
                 glLoadIdentity();
-                glMatrixMode(GL_MODELVIEW);
-                glLoadIdentity();
-                glOrtho(-ratio, ratio, -1.f, 1.f, 1.f, -1.f);
-                glBegin(GL_TRIANGLES);
-                glColor3f(1.f, 0.f, 0.f);
-                glVertex3f(-0.6f, -0.4f, 0.f);
-                glColor3f(0.f, 1.f, 0.f);
-                glVertex3f(0.6f, -0.4f, 0.f);
-                glColor3f(0.f, 0.f, 1.f);
-                glVertex3f(0.f, 0.6f, 0.f);
+                // glMatrixMode(GL_MODELVIEW);
+                // glLoadIdentity();
+                glOrtho(0.0f, width, 0.f, height, 0.f, 1.f);
+
+                // Draw particles
+                glEnable(GL_ALPHA_TEST);
+                glAlphaFunc(GL_NOTEQUAL, 0);
+                glEnable(GL_BLEND);
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                glEnable( GL_POINT_SMOOTH );
+                glPointSize( 8.0 );
+                glBegin(GL_POINTS);
+                for (auto& particle : particles) {
+                    glColor3f(1.0f, 0.0f, 0.0f);
+                    glVertex2f(particle.pos().x(), particle.pos().y());
+                    // std::cout << "Particle: " << particle.pos().x() << " " << particle.pos().y() << std::endl;
+                }
                 glEnd();
+                glDisable(GL_POINT_SMOOTH);
+                glBlendFunc(GL_NONE, GL_NONE);
+                glDisable(GL_BLEND);
+
+                // Draw joints
+                // glBegin(GL_LINES);
+                // for (auto& joint : joints) {
+                //     glColor3f(0.0f, 0.0f, 1.0f);
+                //     glVertex2f(joint.p1().pos().x(), joint.p1().pos().y());
+                //     glVertex2f(joint.p2().pos().x(), joint.p2().pos().y());
+                // }
+                // glEnd();
                 glfwSwapBuffers(window);
             }
 
@@ -73,7 +92,7 @@ namespace game {
                 glfwGetVersion(&major, &minor, &rev);
                 std::cout << "glfw major.minor " << major << "." << minor << "." << rev << std::endl;
 
-                window = glfwCreateWindow(HEIGHT, WIDTH, "Hello World", NULL, NULL);
+                window = glfwCreateWindow(WIDTH, HEIGHT, "Hello World", NULL, NULL);
                 if (!window) {
                     glfwTerminate();
                     throw std::runtime_error("Failed to create window");
@@ -99,16 +118,18 @@ namespace game {
             GameStateController(int argc, char* argv[]): point_manager(ParticleJointManager<float>()), ui_controller(UIController(argc, argv)) {
                 // Add dummy particles and joints
                 point_manager.addParticle(physics::Particle<float>(
-                    physics::Particle<float>::Point(5, 5)
+                    physics::Particle<float>::Point(50, 50), // Position
+                    physics::Particle<float>::Vector(1, 2) // Velocity
                 ));
                 point_manager.addParticle(physics::Particle<float>(
-                    physics::Particle<float>::Point(10, 10)
+                    physics::Particle<float>::Point(100, 200), // Position
+                    physics::Particle<float>::Vector(1, 2) // Velocity
                 ));
                 point_manager.addJoint(physics::Joint<float>(
                     point_manager.getParticles()[0],
                     point_manager.getParticles()[1]
                 ));
-                
+
                 main_loop();
             }
             ~GameStateController() = default;
@@ -132,8 +153,11 @@ namespace game {
                 }
             }
         
-            // Called every frame
-            static void update_game_state(){}
+            // Called every 1/FPS seconds
+            void update_game_state(){
+                // Update particles and joints
+                point_manager.update();
+            }
 
             ParticleJointManager<float> point_manager;
             UIController ui_controller;
