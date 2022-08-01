@@ -64,7 +64,7 @@ namespace game {
                 glBegin(GL_POINTS);
                 for (auto& particle : particles) {
                     glColor3f(1.0f, 0.0f, 0.0f);
-                    glVertex2f(particle.pos().x(), particle.pos().y());
+                    glVertex2f(particle.x(), particle.y());
                     // std::cout << "Particle: " << particle.pos().x() << " " << particle.pos().y() << std::endl;
                 }
                 glEnd();
@@ -73,13 +73,13 @@ namespace game {
                 glDisable(GL_BLEND);
 
                 // Draw joints
-                // glBegin(GL_LINES);
-                // for (auto& joint : joints) {
-                //     glColor3f(0.0f, 0.0f, 1.0f);
-                //     glVertex2f(joint.p1().pos().x(), joint.p1().pos().y());
-                //     glVertex2f(joint.p2().pos().x(), joint.p2().pos().y());
-                // }
-                // glEnd();
+                glBegin(GL_LINES);
+                for (auto& joint : joints) {
+                    glColor3f(0.0f, 0.0f, 1.0f);
+                    glVertex2f(joint.x1(), joint.y1());
+                    glVertex2f(joint.x2(), joint.y2());
+                }
+                glEnd();
                 glfwSwapBuffers(window);
             }
 
@@ -118,12 +118,12 @@ namespace game {
             GameStateController(int argc, char* argv[]): point_manager(ParticleJointManager<float>()), ui_controller(UIController(argc, argv)) {
                 // Add dummy particles and joints
                 point_manager.addParticle(physics::Particle<float>(
-                    physics::Particle<float>::Point(50, 50), // Position
-                    physics::Particle<float>::Vector(1, 2) // Velocity
+                    50, 50, // Position
+                    1, 2 // Acceleration
                 ));
                 point_manager.addParticle(physics::Particle<float>(
-                    physics::Particle<float>::Point(100, 200), // Position
-                    physics::Particle<float>::Vector(1, 2) // Velocity
+                    100, 200, // Position
+                    1, 2 // Acceleration
                 ));
                 point_manager.addJoint(physics::Joint<float>(
                     point_manager.getParticles()[0],

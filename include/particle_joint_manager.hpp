@@ -35,12 +35,12 @@ namespace game {
             }
 
             // Get particles
-            std::vector<physics::Particle<T>> getParticles() {
+            std::vector<physics::Particle<T>>& getParticles() {
                 return particles;
             }
 
             // Get joints
-            std::vector<physics::Joint<T>> getJoints() {
+            std::vector<physics::Joint<T>>& getJoints() {
                 return joints;
             }
         private:
