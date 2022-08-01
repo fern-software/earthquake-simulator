@@ -35,10 +35,21 @@ public:
 		p2_.pos_ += delta * 0.5 * diff;
 	}
 
-	// Returns the first particle of the joint.
-	ParticleType p1() const { return p1_; }
-	// Returns the second particle of the joint.
-	ParticleType p2() const { return p2_; }
+	T x1() const {
+		return p1_.x();
+	}
+
+	T y1() const {
+		return p1_.y();
+	}
+
+	T x2() const {
+		return p2_.x();
+	}
+
+	T y2() const {
+		return p2_.y();
+	}
 
 private:
 	T length_;

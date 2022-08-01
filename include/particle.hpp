@@ -14,8 +14,8 @@ public:
 	using Point = CGAL::Point_2<CGAL::Cartesian<T>>;
 	using Vector = CGAL::Vector_2<CGAL::Cartesian<T>>;
 	
-	// Constructs a particle at the given position (pos) which is subjet to the given acceleration (a).
-	Particle(Point pos, Vector a = Vector(0, 0)) : pos_(pos), prev_pos_(pos), a_(a){}
+	// Constructs a particle at the given position which is subjet to the given acceleration.
+	Particle(T x, T y, T ax, T ay) : pos_(Point(x, y)), prev_pos_(Point(x, y)), a_(Vector(ax, ay)){}
 
 	// Updates the position of the particle using Verlet Integration.
 	void update(T dt){
@@ -24,13 +24,13 @@ public:
 		prev_pos_ = tmp;
 	}
 
-	// Moves the particle by the given vector (v).
-	// void move(Vector v){
-	// 	pos_ += v;
-	// }
+	T x() const {
+		return pos_.x();
+	}
 
-	// Returns the position of the particle.
-	Point pos() const { return pos_; }
+	T y() const {
+		return pos_.y();
+	}
 
 private:
 	template <class U> friend class Joint;
