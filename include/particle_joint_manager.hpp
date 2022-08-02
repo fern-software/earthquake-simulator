@@ -26,7 +26,7 @@ namespace game {
 
             // Find particle at a given position
             // If this is too slow use a hashtable or something
-            physics::Particle<T>* particleAt(const double x, const double y) const {
+            physics::Particle<T>* particleAt(const double x, const double y) {
                 for (auto& particle : particles) {
                     if (particle.x() == x && particle.y() == y) {
                         return &particle;

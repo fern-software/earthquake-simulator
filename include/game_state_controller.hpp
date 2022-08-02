@@ -18,10 +18,18 @@
 #define HEIGHT 480
 #define FPS 60
 
+        
 namespace game {
+    enum class insertion_mode_t {
+        PARTICLE,
+        JOINT
+    };
+
     class UIController {
         public:
-            UIController(int argc, char* argv[]): window(nullptr), ratio(0.0f) {
+            GLFWwindow* window;
+
+            UIController(): window(nullptr), ratio(0.0f) {
                 try {
                     initGLFW();
                 } catch (std::exception& e) {
@@ -37,17 +45,7 @@ namespace game {
             static void error_callback(int error, const char* description) {
                 std::cout << "GLFW Error: " << description << std::endl;
             }
-            static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-                if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-                    glfwSetWindowShouldClose(window, GL_TRUE);
-            }
-
-            void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
-                if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS){
-                    
-                }
-                    
-            }
+            
 
             void render(std::vector<physics::Particle<float>> particles, std::vector <physics::Joint<float>> joints) {
                 glClear(GL_COLOR_BUFFER_BIT);
@@ -106,26 +104,33 @@ namespace game {
                 }
 
                 glfwMakeContextCurrent(window);
-                glfwSetKeyCallback(window, key_callback);
-                glfwSetMouseButtonCallback(window, mouse_button_callback);
+                
             }
 
             // Should close the window?
-            bool shouldClose() {
+            bool shouldClose() const {
                 return glfwWindowShouldClose(window);
             }
 
         private:
-            GLFWwindow* window;
             float ratio;
+            
     };
 
     class GameStateController {
         public:
-            // Create empty point manager and initialize openGL window
-            GameStateController(int argc, char* argv[]): point_manager(ParticleJointManager<float>()), 
-                                                         ui_controller(UIController(argc, argv)),
-                                                         simulation_running(false) {
+            
+            static insertion_mode_t insertion_mode;
+            static physics::Particle<float>* prev_joint_particle;
+            static bool simulation_running;
+            static ParticleJointManager<float> point_manager;
+            static UIController ui_controller;
+
+            // Create empty point manager and initialize an OpenGL window
+            GameStateController(int argc, char* argv[]) {
+                glfwSetKeyCallback(ui_controller.window, key_callback);
+                glfwSetMouseButtonCallback(ui_controller.window, mouse_button_callback);
+
                 // Add dummy particles and joints
                 point_manager.addParticle(physics::Particle<float>(
                     50, 50, // Position
@@ -143,14 +148,54 @@ namespace game {
                 main_loop();
             }
             ~GameStateController() = default;
+
+
+            static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+                if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+                    glfwSetWindowShouldClose(ui_controller.window, GL_TRUE);
+            }
+
+            static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+                if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+                    // Get cursor position
+                    double xpos, ypos;
+                    glfwGetCursorPos(ui_controller.window, &xpos, &ypos);
+                    int x = (int)xpos;
+                    int y = HEIGHT - (int)ypos; // Y starts from top, we want it from bottom
+                    // Snap to the nearest 10th grid point
+                    if(x % 10 < 5)  x -= x % 10;
+                    else            x += 10 - x % 10;
+                    glfwSetCursorPos(ui_controller.window, x, y);
+
+                    if (insertion_mode == insertion_mode_t::PARTICLE){
+                        // If the mouse is over nothing and the insertion mode is particle, insert a particle
+                        if (!point_manager.particleAt(x, y)) {
+                            point_manager.addParticle(physics::Particle<float>(x, y));
+                        }
+
+                        // We selected an existing particle, enter joint mode
+                        else {
+                            insertion_mode = insertion_mode_t::JOINT;
+                            prev_joint_particle = point_manager.particleAt(x, y);
+                        }
+                        
+                    }
+                    else if (insertion_mode == insertion_mode_t::JOINT){
+                        // If the insertion mode is joint, insert a joint (Joint handles collision detection)
+                        // point_manager.addJoint(physics::Joint<float>(x, y));
+                    }
+                    
+                }
+                    
+            }
             
         private:
 
             // Calls update_game_state every 1/FPS seconds
             // Calls render as often as possible
-            void main_loop() {
+            static void main_loop() {
                 auto a = std::chrono::high_resolution_clock::now();
-               while (!ui_controller.shouldClose()) {
+                while (!ui_controller.shouldClose()) {
                     auto b = std::chrono::high_resolution_clock::now();
                     auto delta_time = std::chrono::duration_cast<std::chrono::milliseconds>(b - a).count();
                     if(delta_time >= 1000 / FPS) {
@@ -164,7 +209,7 @@ namespace game {
             }
         
             // Called every 1/FPS seconds
-            void update_game_state(){
+            static void update_game_state(){
                 // Update particles and joints
                 // Calculates physics only when the simulation is running
                 if (simulation_running) {
@@ -172,8 +217,12 @@ namespace game {
                 }
             }
 
-            bool simulation_running;
-            ParticleJointManager<float> point_manager;
-            UIController ui_controller;
+            
     };
+
+    insertion_mode_t GameStateController::insertion_mode = insertion_mode_t::PARTICLE;
+    physics::Particle<float>* GameStateController::prev_joint_particle = nullptr;
+    bool GameStateController::simulation_running = false;
+    UIController GameStateController::ui_controller = UIController();
+    ParticleJointManager<float> GameStateController::point_manager = ParticleJointManager<float>();
 }
