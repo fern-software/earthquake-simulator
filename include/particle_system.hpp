@@ -12,74 +12,69 @@ namespace physics {
 	
 template <typename T> class ParticleSystem {
 public:
-	using Particle = Particle<T>;
-	using Joint = Joint<T>;
-	using Vector = typename Particle::Vector;
+	using Vector = typename Particle<T>::Vector;
 
 	ParticleSystem(T gravity_x, T gravity_y): gravity_(Vector(gravity_x, gravity_y)){}
 
-	// Returns true and sets particle to the particle at the given position if it exists else
-	// returns false. If two exist at the given position then it returns the first one that is
-	// found.
+	// Returns the particle at the given position if it exists. Returns nullptr if it does not.
+	// If two exist at the given position then it returns the first one that is found.
 	// Preconditions: x, y must be representable as exact values or results are undefined.
-	bool particle_at(T x, T y, Particle& particle) const {
-		for(auto& p : particles) {
+	Particle<T>* particle_at(T x, T y){
+		for(auto& p : particles_) {
 			if(p.x() == x && p.y() == y) {
-				particle = p;
-				return true;
+				return &p;
 			}
 		}
 
-		return false;
+		return nullptr;
 	}
 
 	// Creates a new particle at the given position subject to the system's gravity and returns a
 	// reference to it.
-	Particle& create_particle(T x, T y) {
-		particles.push_back(Particle(x, y, gravity_));
-		return particles.back();
+	Particle<T>& create_particle(T x, T y) {
+		particles_.push_back(Particle<T>(x, y, gravity_));
+		return particles_.back();
 	}
 
 	// Creates a joint in the system between two particles. If particles do not exist at the given
 	// coordinates, then particles are created at them first. If particles already exist at the
 	// given coordinates, new particles are not created.
 	void create_joint(T x1, T y1, T x2, T y2){
-		Particle& p1;
-		Particle& p2;
-
-		if(!particle_at(x1, y1, p1)){
-			p1 = create_particle(x1, y1);
+		Particle<T>* p1 = particle_at(x1, y1);
+		if(!p1){
+			p1 = &create_particle(x1, y1);
 		}
 		
-		if(!particle_at(x2, y2, p2)){
-			p2 = create_particle(x2, y2);
+		Particle<T>* p2 = particle_at(x2, y2);
+		if(!p2){
+			p2 = &create_particle(x2, y2);
 		}
 
-		joints.push_back(Joint(p1, p2));
+		joints_.push_back(Joint(*p1, *p2));
 	}
 
 	// TODO: implement
 	void update() {
-		for (auto& particle : particles) {
+		for (auto& particle : particles_) {
 			particle.update(0.5f);
 		}
 	}
 
 	// Returns a reference to the list of all particles in the system.
-	std::vector<Particle>& particles(){
-		return particles;
+	std::vector<Particle<T>>& particles(){
+		return particles_;
 	}
 
 	// Returns a reference to the list of all joints in the system.
-	std::vector<Joints>& joints(){
-		return joints;
+	std::vector<Joint<T>>& joints(){
+		return joints_;
 	}
 
 private:
 	// constant acceleration that all particles in the system are subject to
 	Vector gravity_;
 
-	std::vector<Particle> particles;
-	std::vector<Joint> joints;
+	std::vector<Particle<T>> particles_;
+	std::vector<Joint<T>> joints_;
 };
 }

@@ -9,7 +9,7 @@
 #include <exception>
 #include <chrono>
 #include <vector>
-#include "particle_joint_manager.hpp"
+#include "particle_system.hpp"
 #include "particle.hpp"
 #include "joint.hpp"
 
@@ -114,21 +114,12 @@ namespace game {
 
     class GameStateController {
         public:
-            // Create empty point manager and initialize openGL window
-            GameStateController(int argc, char* argv[]): point_manager(ParticleJointManager<float>()), ui_controller(UIController(argc, argv)) {
+            // Create at particle system and initialize openGL window
+            GameStateController(int argc, char* argv[]): particle_system(physics::ParticleSystem<float>(0, -1)), ui_controller(UIController(argc, argv)) {
                 // Add dummy particles and joints
-                point_manager.addParticle(physics::Particle<float>(
-                    50, 50, // Position
-                    1, 2 // Acceleration
-                ));
-                point_manager.addParticle(physics::Particle<float>(
-                    100, 200, // Position
-                    1, 2 // Acceleration
-                ));
-                point_manager.addJoint(physics::Joint<float>(
-                    point_manager.getParticles()[0],
-                    point_manager.getParticles()[1]
-                ));
+                particle_system.create_particle(50, 50);
+                particle_system.create_particle(100, 200);
+                particle_system.create_joint(50, 50, 100, 200);
 
                 main_loop();
             }
@@ -147,7 +138,7 @@ namespace game {
                         a = b;
                         update_game_state();
                     }
-                    ui_controller.render(point_manager.getParticles(), point_manager.getJoints());
+                    ui_controller.render(particle_system.particles(), particle_system.joints());
                     glfwPollEvents();
                     
                 }
@@ -156,10 +147,10 @@ namespace game {
             // Called every 1/FPS seconds
             void update_game_state(){
                 // Update particles and joints
-                point_manager.update();
+                particle_system.update();
             }
 
-            ParticleJointManager<float> point_manager;
+            physics::ParticleSystem<float> particle_system;
             UIController ui_controller;
     };
 }
