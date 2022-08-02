@@ -18,17 +18,19 @@ public:
 
 	ParticleSystem(T gravity_x, T gravity_y): gravity_(Vector(gravity_x, gravity_y)){}
 
-	// Returns the particle at the given position if it exists. Throws std::out_of_range if it 
-	// does not. If two exist at the given position then it returns the first one that is found.
+	// Returns true and sets particle to the particle at the given position if it exists else
+	// returns false. If two exist at the given position then it returns the first one that is
+	// found.
 	// Preconditions: x, y must be representable as exact values or results are undefined.
-	Particle& particle_at(T x, T y){
+	bool particle_at(T x, T y, Particle& particle) const {
 		for(auto& p : particles) {
 			if(p.x() == x && p.y() == y) {
-				return p;
+				particle = p;
+				return true;
 			}
 		}
 
-		throw std::out_of_range("No particle found at the given position");
+		return false;
 	}
 
 	// Creates a new particle at the given position subject to the system's gravity and returns a
@@ -45,19 +47,15 @@ public:
 		Particle& p1;
 		Particle& p2;
 
-		try {
-			p1 = particle_at(x1, y1);
-		} catch(std::out_of_range&){
+		if(!particle_at(x1, y1, p1)){
 			p1 = create_particle(x1, y1);
 		}
 		
-		try {
-			p2 = particle_at(x2, y2);
-		} catch(std::out_of_range&){
+		if(!particle_at(x2, y2, p2)){
 			p2 = create_particle(x2, y2);
 		}
 
-		joints.push_back(Joint(p1.second, p2.second));
+		joints.push_back(Joint(p1, p2));
 	}
 
 	// TODO: implement
