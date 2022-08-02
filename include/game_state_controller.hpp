@@ -115,7 +115,7 @@ namespace game {
     class GameStateController {
         public:
             // Create at particle system and initialize openGL window
-            GameStateController(int argc, char* argv[]): particle_system(physics::ParticleSystem<float>(0, -1)), ui_controller(UIController(argc, argv)) {
+            GameStateController(int argc, char* argv[]): particle_system(physics::ParticleSystem<float>(WIDTH, HEIGHT, 0, -1)), ui_controller(UIController(argc, argv)) {
                 // Add dummy particles and joints
                 particle_system.create_particle(50, 50);
                 particle_system.create_particle(100, 200);
