@@ -9,9 +9,7 @@
 #include <exception>
 #include <chrono>
 #include <vector>
-#include "particle_system.hpp"
-#include "particle.hpp"
-#include "joint.hpp"
+#include "earthquake_system.hpp"
 
 #define PIXEL_FORMAT GL_RGB
 #define WIDTH 640
@@ -115,16 +113,16 @@ namespace game {
     class GameStateController {
         public:
             // Create at particle system and initialize openGL window
-            GameStateController(int argc, char* argv[]): particle_system(physics::ParticleSystem<float>(WIDTH, HEIGHT, 0, -1)), ui_controller(UIController(argc, argv)) {
+            GameStateController(int argc, char* argv[]): earthquake_system(EarthquakeSystem<float>(WIDTH, HEIGHT)), ui_controller(UIController(argc, argv)) {
                 // Add dummy particles and joints
-                particle_system.create_particle(50, 50, false);
-                particle_system.create_particle(100, 200, false);
-                particle_system.create_particle(50, 100, false);
-                particle_system.create_particle(100, 100, true);
-                particle_system.create_joint(50, 50, 100, 200);
-                particle_system.create_joint(50, 50, 50, 100);
-                particle_system.create_joint(50, 100, 100, 200);
-                particle_system.create_joint(50, 100, 100, 100);
+                earthquake_system.create_particle(50, 50);
+                earthquake_system.create_particle(100, 200);
+                earthquake_system.create_particle(50, 100);
+                earthquake_system.create_particle(100, 0);
+                earthquake_system.create_joint(50, 50, 100, 200);
+                earthquake_system.create_joint(50, 50, 50, 100);
+                earthquake_system.create_joint(50, 100, 100, 200);
+                earthquake_system.create_joint(50, 100, 100, 0);
 
                 main_loop();
             }
@@ -143,7 +141,7 @@ namespace game {
                         a = b;
                         update_game_state();
                     }
-                    ui_controller.render(particle_system.particles(), particle_system.joints());
+                    ui_controller.render(earthquake_system.particles(), earthquake_system.joints());
                     glfwPollEvents();
                     
                 }
@@ -152,10 +150,10 @@ namespace game {
             // Called every 1/FPS seconds
             void update_game_state(){
                 // Update particles and joints
-                particle_system.update();
+                earthquake_system.update();
             }
 
-            physics::ParticleSystem<float> particle_system;
+            EarthquakeSystem<float> earthquake_system;
             UIController ui_controller;
     };
 }

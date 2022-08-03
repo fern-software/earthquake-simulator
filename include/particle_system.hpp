@@ -7,7 +7,6 @@
 #include "particle.hpp"
 #include "joint.hpp"
 
-
 namespace physics {
 
 // Represents a system of Particles and Joints with a width, height, and constant gravity.
@@ -15,7 +14,10 @@ template <typename T> class ParticleSystem {
 public:
 	using Vector = typename Particle<T>::Vector;
 
-	ParticleSystem(unsigned int width, unsigned int height, T gravity_x, T gravity_y): width_(width), height_(height), gravity_(Vector(gravity_x, gravity_y)){}
+	ParticleSystem(unsigned int width, unsigned int height, T gravity_x, T gravity_y): 
+		width_(width),
+		height_(height),
+		gravity_(Vector(gravity_x, gravity_y)){}
 
 	// Returns the particle at the given position if it exists. Returns nullptr if it does not.
 	// If two exist at the given position then it returns the first one that is found.
@@ -32,26 +34,16 @@ public:
 
 	// Creates a new particle at the given position subject to the system's gravity and returns a
 	// reference to it.
-	Particle<T>& create_particle(T x, T y, bool fixed) {
+	Particle<T>& create_particle(T x, T y, bool fixed){
 		particles_.push_back(Particle<T>(x, y, fixed, width_, height_, gravity_));
 		return particles_.back();
 	}
 
-	// Creates a joint in the system between two particles. If particles do not exist at the given
-	// coordinates, then particles are created at them first. If particles already exist at the
-	// given coordinates, new particles are not created.
-	void create_joint(T x1, T y1, T x2, T y2){
-		Particle<T>* p1 = particle_at(x1, y1);
-		if(!p1){
-			p1 = &create_particle(x1, y1, false);
-		}
-		
-		Particle<T>* p2 = particle_at(x2, y2);
-		if(!p2){
-			p2 = &create_particle(x2, y2, false);
-		}
-
-		joints_.push_back(Joint(*p1, *p2));
+	// Creates a joint in the system between the two given particles. Retruns a reference to the
+	// joint created.
+	Joint<T>& create_joint(Particle<T>& p1, Particle<T>& p2){
+		joints_.push_back(Joint(p1, p2));
+		return joints_.back();
 	}
 
 	// Updates the simulation by a given timestep dt.
