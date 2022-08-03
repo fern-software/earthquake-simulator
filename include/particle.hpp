@@ -68,12 +68,23 @@ public:
 	}
 
 private:
+	// Joints need to be able to directly modify the position of particles
 	template <class U> friend class Joint;
+
+	// position of the particle
 	Point pos_;
+
+	// previous position of the particle
 	Point prev_pos_;
+
+	// constant accleration the particle is subject to
 	Vector a_;
+
+	// width and height of the system the particle is in
 	unsigned int system_width_;
 	unsigned int system_height_;
+
+	// whether the particle is fixed to a point in space or not
 	bool fixed_;
 };
 
