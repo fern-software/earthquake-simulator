@@ -9,11 +9,8 @@
 #include <exception>
 #include <chrono>
 #include <vector>
-#include <utility>
 #include "font_controller.hpp"
-#include "particle_joint_manager.hpp"
-#include "particle.hpp"
-#include "joint.hpp"
+#include "earthquake_system.hpp"
 
 
 namespace game {
@@ -169,7 +166,7 @@ namespace game {
             static insertion_mode_t insertion_mode;
             static physics::Particle<float>* prev_joint_particle;
             static bool simulation_running;
-            static ParticleJointManager<float> point_manager;
+            static EarthquakeSystem<float> earthquake_system;
             static UIController ui_controller;
 
             // Create empty point manager and initialize an OpenGL window
@@ -177,20 +174,37 @@ namespace game {
                 glfwSetErrorCallback(error_callback);
                 glfwSetKeyCallback(ui_controller.window, key_callback);
                 glfwSetMouseButtonCallback(ui_controller.window, mouse_button_callback);
-
                 // Add dummy particles and joints
-                point_manager.addParticle(physics::Particle<float>(
-                    50, 50, // Position
-                    1, 2 // Acceleration
-                ));
-                point_manager.addParticle(physics::Particle<float>(
-                    100, 200, // Position
-                    1, 2 // Acceleration
-                ));
-                point_manager.addJoint(physics::Joint<float>(
-                    point_manager.getParticles()[0],
-                    point_manager.getParticles()[1]
-                ));
+
+                // bad tower
+                // earthquake_system.create_joint(50, 0, 50, 50);
+                // earthquake_system.create_joint(50, 50, 50, 100);
+                // earthquake_system.create_joint(50, 150, 50, 100);
+                
+                // earthquake_system.create_joint(100, 0, 100, 50);
+                // earthquake_system.create_joint(100, 50, 100, 100);
+                // earthquake_system.create_joint(100, 150, 100, 100);
+
+                // earthquake_system.create_joint(50, 50, 100, 50);
+                // earthquake_system.create_joint(50, 100, 100, 100);
+                // earthquake_system.create_joint(50, 150, 100, 150);
+
+                // // decent tower
+                // earthquake_system.create_joint(250, 0, 250, 50);
+                // earthquake_system.create_joint(250, 50, 250, 100);
+                // earthquake_system.create_joint(250, 150, 250, 100);
+                
+                // earthquake_system.create_joint(300, 0, 300, 50);
+                // earthquake_system.create_joint(300, 50, 300, 100);
+                // earthquake_system.create_joint(300, 150, 300, 100);
+
+                // earthquake_system.create_joint(250, 50, 300, 50);
+                // earthquake_system.create_joint(250, 100, 300, 100);
+                // earthquake_system.create_joint(250, 150, 300, 150);
+
+                // earthquake_system.create_joint(250, 0, 300, 50);
+                // earthquake_system.create_joint(250, 50, 300, 100);
+                // earthquake_system.create_joint(250, 100, 300, 150);
 
                 main_loop();
             }
@@ -223,7 +237,9 @@ namespace game {
                         y <= ui_controller.stop_bbox.top && y >= ui_controller.stop_bbox.btm) {
                         // Stop simulation
                         simulation_running = false;
-                    } else if (!simulation_running) {
+                        insertion_mode = insertion_mode_t::PARTICLE;
+                    } 
+                    else if (!simulation_running) {
                         // Insertion mode
                         // Snap to the nearest 20th grid point
                         if(x % 20 < 5)  x -= x % 20;
@@ -231,25 +247,27 @@ namespace game {
                         if(y % 20 < 5)  y -= y % 20;
                         else            y += 20 - y % 20;
 
-                        if (insertion_mode == insertion_mode_t::PARTICLE){
-                            // If the mouse is over nothing and the insertion mode is particle, insert a particle
-                            if (!point_manager.particleAt(x, y)) {
-                                point_manager.addParticle(physics::Particle<float>(x, y));
-                            }
+                        switch(insertion_mode){
+                            case insertion_mode_t::PARTICLE:
+                                if (!earthquake_system.particle_at(x, y)) {
+                                    prev_joint_particle = &earthquake_system.create_particle(x, y);
+                                }
+                                // We selected an existing particle, enter joint mode
+                                else {
+                                    insertion_mode = insertion_mode_t::JOINT;
+                                }
+                                break;
+                            case insertion_mode_t::JOINT:
+                                earthquake_system.create_joint(prev_joint_particle->x(), prev_joint_particle->y(), x, y);
+                                insertion_mode = insertion_mode_t::PARTICLE;
+                                break;
+                            default:
+                                throw std::runtime_error("Unknown insertion mode");
+                                break;
+                        }
 
-                            // We selected an existing particle, enter joint mode
-                            else {
-                                insertion_mode = insertion_mode_t::JOINT;
-                                prev_joint_particle = point_manager.particleAt(x, y);
-                            }
-                            
-                        }
-                        else if (insertion_mode == insertion_mode_t::JOINT){
-                            // If the insertion mode is joint, insert a joint (Joint handles collision detection)
-                            // point_manager.addJoint(physics::Joint<float>(x, y));
-                        }
                     }
-                    
+                        
                 }
                     
             }
@@ -267,8 +285,8 @@ namespace game {
                         a = b;
                         update_game_state();
                     }
-                    ui_controller.render(point_manager.getParticles(), 
-                                         point_manager.getJoints(), 
+                    ui_controller.render(earthquake_system.particles(), 
+                                         earthquake_system.joints(), 
                                          simulation_running, // Simulation state
                                          insertion_mode); // Insertion mode
                     glfwPollEvents();
@@ -281,17 +299,16 @@ namespace game {
                 // Update particles and joints
                 // Calculates physics only when the simulation is running
                 if (simulation_running) {
-                    point_manager.update();
+                    earthquake_system.update();
                 }
             }
 
-            
-    };
+        };
 
     insertion_mode_t GameStateController::insertion_mode = insertion_mode_t::PARTICLE;
     physics::Particle<float>* GameStateController::prev_joint_particle = nullptr;
     bool GameStateController::simulation_running = false;
     UIController GameStateController::ui_controller = UIController();
     FontController UIController::font_controller = FontController();
-    ParticleJointManager<float> GameStateController::point_manager = ParticleJointManager<float>();
+    EarthquakeSystem<float> GameStateController::earthquake_system = EarthquakeSystem<float>(WIDTH, HEIGHT);
 }
