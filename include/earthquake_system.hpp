@@ -11,9 +11,10 @@ namespace game {
 // Represents a ParticleSystem specific to an earthquake simulation.
 template <typename T> class EarthquakeSystem {
 public:
-	// Creates a new EarthquakeSystem with the given width, height, and *realistic* gravity.
+	// Creates a new EarthquakeSystem with the given width, height, *realistic* gravity and a
+	// 'ground' which particles position's may not enter.
 	EarthquakeSystem(unsigned int width, unsigned int height) :
-		run_time_(0), system_(physics::ParticleSystem<T>(width, height, 0, -1)){}
+		run_time_(0), system_(physics::ParticleSystem<T>(0, width, 40, height, 0, -1)){}
 
 
 	physics::Particle<T>* particle_at(T x, T y){
@@ -25,7 +26,7 @@ public:
 	// then it is not added again and reference to that particle is returned.
 	physics::Particle<T>& create_particle(T x, T y){
 		if (!particle_at(x, y)) {
-			return system_.create_particle(x, y, y == 0 ? true : false);
+			return system_.create_particle(x, y, y == 40 ? true : false);
 		}
 		return *particle_at(x, y);
 	}

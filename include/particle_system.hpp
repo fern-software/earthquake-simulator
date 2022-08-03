@@ -9,18 +9,28 @@
 
 namespace physics {
 
-// Represents a system of Particles and Joints with a width, height, and constant gravity.
+// Represents a system of Particles and Joints within a bounded box subject to constant gravity.
 template <typename T> class ParticleSystem {
 public:
+	using Point = typename Particle<T>::Point;
 	using Vector = typename Particle<T>::Vector;
+	using Rectangle = typename Particle<T>::Rectangle;
 
-	ParticleSystem(unsigned int width, unsigned int height, T gravity_x, T gravity_y): 
-		width_(width),
-		height_(height),
+	ParticleSystem(
+		T lower_bound_x,
+		T upper_bound_x,
+		T lower_bound_y,
+		T upper_bound_y,
+		T gravity_x,
+		T gravity_y
+	) : 
+		lower_bound_(Point(lower_bound_x, lower_bound_y)),
+		upper_bound_(Point(upper_bound_x, upper_bound_y)),
+		bounding_box_(Rectangle(lower_bound_, upper_bound_)),
 		gravity_(Vector(gravity_x, gravity_y))
 	{
-		particles_.reserve(width * height);
-		joints_.reserve(width * height);
+		particles_.reserve(100);
+		joints_.reserve(100);
 	}
 
 	// Returns the particle at the given position if it exists. Returns nullptr if it does not.
@@ -39,7 +49,7 @@ public:
 	// Creates a new particle at the given position subject to the system's gravity and returns a
 	// reference to it.
 	Particle<T>& create_particle(T x, T y, bool fixed){
-		particles_.push_back(Particle<T>(x, y, fixed, width_, height_, gravity_));
+		particles_.push_back(Particle<T>(x, y, fixed, bounding_box_, gravity_));
 		return particles_.back();
 	}
 
@@ -83,10 +93,15 @@ public:
 	}
 
 private:
-	// width and height of the system
-	unsigned int width_, height_;
+	// Points which make up the bounding box of the system. Since the rectangle constructor
+	// takes references, we need to store these Points for the lifetime of the system.
+	Point lower_bound_;
+	Point upper_bound_;
+
+	// Actual bounding box of the system, all particles must stay within this box.
+	Rectangle bounding_box_;
 	
-	// constant acceleration that all particles in the system are subject to
+	// Constant acceleration that all particles in the system are subject to.
 	Vector gravity_;
 
 	// list of particles and joints in the system
