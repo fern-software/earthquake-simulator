@@ -55,7 +55,12 @@ namespace game {
                 glfwTerminate();
             }
 
-            void render(std::vector<physics::Particle<float>> particles, std::vector <physics::Joint<float>> joints, bool running, insertion_mode_t insertion_mode) {
+            void render(std::vector<physics::Particle<float>> particles, 
+                        std::vector <physics::Joint<float>> joints, 
+                        bool running, 
+                        insertion_mode_t insertion_mode,
+                        physics::Particle<float>* selected_particle) {
+
                 glClearColor (0.0f, 0.0f, 0.0f, 0.0f);
                 glDisable (GL_DEPTH_TEST);
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -114,7 +119,12 @@ namespace game {
 
                 glBegin(GL_POINTS);
                 for (auto& particle : particles) {
-                    glColor3f(1.0f, 0.0f, 0.0f);
+                    if(selected_particle && particle == *selected_particle) {
+                        glColor3f(0.0f, 1.0f, 0.0f);
+                    }
+                    else {
+                        glColor3f(1.0f, 0.0f, 0.0f);
+                    }
                     glVertex2f(particle.x(), particle.y());
                 }
                 glEnd();
@@ -255,11 +265,13 @@ namespace game {
                                 // We selected an existing particle, enter joint mode
                                 else {
                                     insertion_mode = insertion_mode_t::JOINT;
+                                    prev_joint_particle = earthquake_system.particle_at(x, y);
                                 }
                                 break;
                             case insertion_mode_t::JOINT:
                                 earthquake_system.create_joint(prev_joint_particle->x(), prev_joint_particle->y(), x, y);
                                 insertion_mode = insertion_mode_t::PARTICLE;
+                                prev_joint_particle = nullptr;
                                 break;
                             default:
                                 throw std::runtime_error("Unknown insertion mode");
@@ -288,7 +300,8 @@ namespace game {
                     ui_controller.render(earthquake_system.particles(), 
                                          earthquake_system.joints(), 
                                          simulation_running, // Simulation state
-                                         insertion_mode); // Insertion mode
+                                         insertion_mode,
+                                         insertion_mode == insertion_mode_t::JOINT ? prev_joint_particle:nullptr); // Insertion mode
                     glfwPollEvents();
                     
                 }

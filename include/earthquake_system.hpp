@@ -48,7 +48,7 @@ public:
 
 	// Updates the simulation by one timestep.
 	void update(){
-		run_time_ += 0.1;
+		run_time_ += 0.5;
 
 		shake_ground();
 		system_.update(0.1);
