@@ -23,6 +23,10 @@ public:
 		system_height_(system_height),
 		fixed_(fixed){}
 
+	bool operator==(const Particle& other) const {
+		return pos_ == other.pos_;
+	}
+	
 	// Updates the position of the particle using Verlet Integration.
 	void update(T dt){
 		if(fixed_){

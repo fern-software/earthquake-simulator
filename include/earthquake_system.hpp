@@ -15,10 +15,18 @@ public:
 	EarthquakeSystem(unsigned int width, unsigned int height) :
 		run_time_(0), system_(physics::ParticleSystem<T>(width, height, 0, -1)){}
 
+
+	physics::Particle<T>* particle_at(T x, T y){
+		return system_.particle_at(x, y);
+	}
+
 	// Creates a particle in the system. If the particle is on the ground (ie: y = 0), then it is
 	// fixed. Returns a reference to the particle created.
 	physics::Particle<T>& create_particle(T x, T y){
-		return system_.create_particle(x, y, y == 0 ? true : false);
+		if (!system_.particle_at(x, y)) {
+			return system_.create_particle(x, y, y < 20 ? true : false);
+		}
+		return *system_.particle_at(x, y);
 	}
 
 	// Creates a joint in the system between two particles. If particles do not exist at the given
@@ -40,7 +48,7 @@ public:
 
 	// Updates the simulation by one timestep.
 	void update(){
-		run_time_ += 0.1;
+		run_time_ += 0.5;
 
 		shake_ground();
 		system_.update(0.1);
