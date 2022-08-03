@@ -9,7 +9,8 @@
 
 
 namespace physics {
-	
+
+// Represents a system of Particles and Joints with a width, height, and constant gravity.
 template <typename T> class ParticleSystem {
 public:
 	using Vector = typename Particle<T>::Vector;
