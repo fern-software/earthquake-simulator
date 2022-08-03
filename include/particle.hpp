@@ -36,7 +36,7 @@ public:
 		stay_in_bounds();
 	}
 
-	// makes sure that the particle is within ([0, width], [0, height])
+	// Makes sure that the particle is within ([0, width], [0, height])
 	void stay_in_bounds(){
 		// check x boudaries
 		if(pos_.x() < 0){
@@ -53,6 +53,13 @@ public:
 		else if(pos_.y() > system_height_){
 			pos_ = Point(pos_.x(), system_height_);
 		}
+	}
+
+	// Moves the particle a given distance. Ignores if a particle is fixed or not but does make
+	// sure that the particle stays within the bounds of the system.
+	void move(T dx, T dy){
+		pos_ += Vector(dx, dy);
+		stay_in_bounds();
 	}
 
 	bool fixed() const {

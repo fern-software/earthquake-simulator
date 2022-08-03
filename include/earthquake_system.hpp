@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cmath>
+
 #include "particle_system.hpp"
 #include "particle.hpp"
 #include "joint.hpp"
@@ -11,7 +13,7 @@ template <typename T> class EarthquakeSystem {
 public:
 	// Creates a new EarthquakeSystem with the given width, height, and *realistic* gravity.
 	EarthquakeSystem(unsigned int width, unsigned int height) :
-		system_(physics::ParticleSystem<T>(width, height, 0, -1)){}
+		run_time_(0), system_(physics::ParticleSystem<T>(width, height, 0, -1)){}
 
 	// Creates a particle in the system. If the particle is on the ground (ie: y = 0), then it is
 	// fixed. Returns a reference to the particle created.
@@ -38,7 +40,20 @@ public:
 
 	// Updates the simulation by one timestep.
 	void update(){
+		run_time_ += 0.1;
+
+		shake_ground();
 		system_.update(0.1);
+	}
+
+	// Moves the particles attached to the ground a set amount depending on the system's run time.
+	// This creates a shaking effect over subsequent calls.
+	void shake_ground(){
+		for(auto& particle : system_.particles()){
+			if(particle.fixed()){
+				particle.move(std::sin(run_time_), 0);
+			}
+		}
 	}
 
 	// Returns a reference to the list of all particles in the system.
@@ -52,6 +67,10 @@ public:
 	}
 
 private:
+	// total time system has been running
+	T run_time_;
+
+	// underlying particle system
 	physics::ParticleSystem<T> system_;
 };
 
