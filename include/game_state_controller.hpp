@@ -9,6 +9,7 @@
 #include <exception>
 #include <chrono>
 #include <vector>
+#include <utility>
 #include "particle_joint_manager.hpp"
 #include "particle.hpp"
 #include "joint.hpp"
@@ -28,6 +29,17 @@ namespace game {
     class UIController {
         public:
             GLFWwindow* window;
+            struct Bbox {
+                int left;
+                int btm;
+                int right;
+                int top;
+            };
+            Bbox start_bbox = {WIDTH-55, HEIGHT-40,
+                               WIDTH-40, HEIGHT-10};
+
+            Bbox stop_bbox = {WIDTH-30, HEIGHT-38,
+                              WIDTH-5, HEIGHT-12};
 
             UIController(): window(nullptr), ratio(0.0f) {
                 try {
@@ -42,22 +54,37 @@ namespace game {
                 glfwTerminate();
             }
 
-            static void error_callback(int error, const char* description) {
-                std::cout << "GLFW Error: " << description << std::endl;
-            }
-            
-
             void render(std::vector<physics::Particle<float>> particles, std::vector <physics::Joint<float>> joints) {
-                glClear(GL_COLOR_BUFFER_BIT);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 int width, height;
                 glfwGetFramebufferSize(window, &width, &height);
                 ratio = width / (float)height;
                 glViewport(0, 0, width, height);
                 glMatrixMode(GL_PROJECTION);
                 glLoadIdentity();
-                // glMatrixMode(GL_MODELVIEW);
-                // glLoadIdentity();
+                glMatrixMode(GL_MODELVIEW);
+                glLoadIdentity();
                 glOrtho(0.0f, width, 0.f, height, 0.f, 1.f);
+
+                // Draw Menu (Start and stop buttons) in the top right of the window
+
+                // Set color to green
+                glColor3f(0.0f, 1.0f, 0.0f);
+                // Draw start button (small 45 degree rotated triangle)
+                glBegin(GL_TRIANGLES);
+                    glVertex2f(start_bbox.right, (start_bbox.top + start_bbox.btm)/2);
+                    glVertex2f(start_bbox.left, start_bbox.btm);
+                    glVertex2f(start_bbox.left, start_bbox.top);
+                glEnd();
+
+                // Draw stop button (Small red square to the right of the start button)
+                glColor3f(1.0f, 0.0f, 0.0f);
+                glBegin(GL_QUADS);
+                    glVertex2f(stop_bbox.right, stop_bbox.btm);
+                    glVertex2f(stop_bbox.right, stop_bbox.top);
+                    glVertex2f(stop_bbox.left, stop_bbox.top);
+                    glVertex2f(stop_bbox.left, stop_bbox.btm);
+                glEnd();
 
                 // Draw particles
                 glEnable(GL_ALPHA_TEST);
@@ -65,7 +92,7 @@ namespace game {
                 glEnable(GL_BLEND);
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                 glEnable( GL_POINT_SMOOTH );
-                glPointSize( 8.0 );
+                glPointSize(8.0);
 
                 glBegin(GL_POINTS);
                 for (auto& particle : particles) {
@@ -85,11 +112,11 @@ namespace game {
                     glVertex2f(joint.x2(), joint.y2());
                 }
                 glEnd();
+
                 glfwSwapBuffers(window);
             }
 
             void initGLFW() {
-                glfwSetErrorCallback(error_callback);
                 if (!glfwInit())
                     throw std::runtime_error("Failed to initialize GLFW");
                 
@@ -127,7 +154,8 @@ namespace game {
             static UIController ui_controller;
 
             // Create empty point manager and initialize an OpenGL window
-            GameStateController(int argc, char* argv[]) {
+            GameStateController() {
+                glfwSetErrorCallback(error_callback);
                 glfwSetKeyCallback(ui_controller.window, key_callback);
                 glfwSetMouseButtonCallback(ui_controller.window, mouse_button_callback);
 
@@ -150,6 +178,10 @@ namespace game {
             ~GameStateController() = default;
 
 
+            static void error_callback(int error, const char* description) {
+                std::cout << "GLFW Error: " << description << std::endl;
+            }
+
             static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
                 if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
                     glfwSetWindowShouldClose(ui_controller.window, GL_TRUE);
@@ -162,27 +194,41 @@ namespace game {
                     glfwGetCursorPos(ui_controller.window, &xpos, &ypos);
                     int x = (int)xpos;
                     int y = HEIGHT - (int)ypos; // Y starts from top, we want it from bottom
-                    // Snap to the nearest 10th grid point
-                    if(x % 10 < 5)  x -= x % 10;
-                    else            x += 10 - x % 10;
-                    glfwSetCursorPos(ui_controller.window, x, y);
 
-                    if (insertion_mode == insertion_mode_t::PARTICLE){
-                        // If the mouse is over nothing and the insertion mode is particle, insert a particle
-                        if (!point_manager.particleAt(x, y)) {
-                            point_manager.addParticle(physics::Particle<float>(x, y));
-                        }
+                    // Check if we're over a button
+                    if (x <= ui_controller.start_bbox.right && x >= ui_controller.start_bbox.left &&
+                        y <= ui_controller.start_bbox.top && y >= ui_controller.start_bbox.btm) {
+                        // Start simulation
+                        simulation_running = true;
+                    } else if (x <= ui_controller.stop_bbox.right && x >= ui_controller.stop_bbox.left &&
+                        y <= ui_controller.stop_bbox.top && y >= ui_controller.stop_bbox.btm) {
+                        // Stop simulation
+                        simulation_running = false;
+                    } else if (!simulation_running) {
+                        // Insertion mode
+                        // Snap to the nearest 20th grid point
+                        if(x % 20 < 5)  x -= x % 20;
+                        else            x += 20 - x % 20;
+                        if(y % 20 < 5)  y -= y % 20;
+                        else            y += 20 - y % 20;
 
-                        // We selected an existing particle, enter joint mode
-                        else {
-                            insertion_mode = insertion_mode_t::JOINT;
-                            prev_joint_particle = point_manager.particleAt(x, y);
+                        if (insertion_mode == insertion_mode_t::PARTICLE){
+                            // If the mouse is over nothing and the insertion mode is particle, insert a particle
+                            if (!point_manager.particleAt(x, y)) {
+                                point_manager.addParticle(physics::Particle<float>(x, y));
+                            }
+
+                            // We selected an existing particle, enter joint mode
+                            else {
+                                insertion_mode = insertion_mode_t::JOINT;
+                                prev_joint_particle = point_manager.particleAt(x, y);
+                            }
+                            
                         }
-                        
-                    }
-                    else if (insertion_mode == insertion_mode_t::JOINT){
-                        // If the insertion mode is joint, insert a joint (Joint handles collision detection)
-                        // point_manager.addJoint(physics::Joint<float>(x, y));
+                        else if (insertion_mode == insertion_mode_t::JOINT){
+                            // If the insertion mode is joint, insert a joint (Joint handles collision detection)
+                            // point_manager.addJoint(physics::Joint<float>(x, y));
+                        }
                     }
                     
                 }

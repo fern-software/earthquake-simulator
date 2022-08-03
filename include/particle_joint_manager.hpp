@@ -12,7 +12,11 @@ namespace game {
     template <typename T>
     class ParticleJointManager {
         public:
-            ParticleJointManager(): particles({}), joints({}) {}
+            ParticleJointManager(): particles({}), joints({}) {
+                // Reallocating particles breaks joint references to them
+                particles.reserve(100);
+                joints.reserve(100);
+            }
 
             ~ParticleJointManager() = default;
 

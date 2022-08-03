@@ -26,6 +26,7 @@ public:
 		p2_ = other.p2_;
 		length_ = other.length_;
 	}
+	
 	// Maintains the length of the joint by moving the two particles closer or farther apart
 	// depending on the current distance between them. Depending on the number of joints
 	// connected to p1 and p2, multiple iterations of this function may be necessary.
