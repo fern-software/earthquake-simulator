@@ -26,19 +26,38 @@ public:
 	// connected to p1 and p2, multiple iterations of this function may be necessary.
 	void maintain_length(){
 		// computes the current distance between the two particles
-		Vector delta = p2_.pos() - p1_.pos();
+		Vector delta = p2_.pos_ - p1_.pos_;
 		T distance = std::sqrt(delta.squared_length());
 		T diff = (distance - length_) / distance;
 
 		// updates the position of the particles
-		p1_.pos_ -= delta * 0.5 * diff;
-		p2_.pos_ += delta * 0.5 * diff;
+		if(p1_.fixed() && !p2_.fixed()){
+			p2_.pos_ -= delta * 0.5 * diff;
+		}
+		else if(p2_.fixed() && !p1_.fixed()){
+			p1_.pos_ += delta * 0.5 * diff;
+		}
+		else if(!p1_.fixed() && !p2_.fixed()){
+			p1_.pos_ += delta * 0.5 * diff;
+			p2_.pos_ -= delta * 0.5 * diff;
+		}
 	}
 
-	// Returns the first particle of the joint.
-	ParticleType p1() const { return p1_; }
-	// Returns the second particle of the joint.
-	ParticleType p2() const { return p2_; }
+	T x1() const {
+		return p1_.x();
+	}
+
+	T y1() const {
+		return p1_.y();
+	}
+
+	T x2() const {
+		return p2_.x();
+	}
+
+	T y2() const {
+		return p2_.y();
+	}
 
 private:
 	T length_;

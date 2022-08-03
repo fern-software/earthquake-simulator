@@ -9,9 +9,7 @@
 #include <exception>
 #include <chrono>
 #include <vector>
-#include "particle_joint_manager.hpp"
-#include "particle.hpp"
-#include "joint.hpp"
+#include "earthquake_system.hpp"
 
 #define PIXEL_FORMAT GL_RGB
 #define WIDTH 640
@@ -64,7 +62,7 @@ namespace game {
                 glBegin(GL_POINTS);
                 for (auto& particle : particles) {
                     glColor3f(1.0f, 0.0f, 0.0f);
-                    glVertex2f(particle.pos().x(), particle.pos().y());
+                    glVertex2f(particle.x(), particle.y());
                     // std::cout << "Particle: " << particle.pos().x() << " " << particle.pos().y() << std::endl;
                 }
                 glEnd();
@@ -73,13 +71,13 @@ namespace game {
                 glDisable(GL_BLEND);
 
                 // Draw joints
-                // glBegin(GL_LINES);
-                // for (auto& joint : joints) {
-                //     glColor3f(0.0f, 0.0f, 1.0f);
-                //     glVertex2f(joint.p1().pos().x(), joint.p1().pos().y());
-                //     glVertex2f(joint.p2().pos().x(), joint.p2().pos().y());
-                // }
-                // glEnd();
+                glBegin(GL_LINES);
+                for (auto& joint : joints) {
+                    glColor3f(0.0f, 0.0f, 1.0f);
+                    glVertex2f(joint.x1(), joint.y1());
+                    glVertex2f(joint.x2(), joint.y2());
+                }
+                glEnd();
                 glfwSwapBuffers(window);
             }
 
@@ -114,21 +112,39 @@ namespace game {
 
     class GameStateController {
         public:
-            // Create empty point manager and initialize openGL window
-            GameStateController(int argc, char* argv[]): point_manager(ParticleJointManager<float>()), ui_controller(UIController(argc, argv)) {
+            // Create at particle system and initialize openGL window
+            GameStateController(int argc, char* argv[]): earthquake_system(EarthquakeSystem<float>(WIDTH, HEIGHT)), ui_controller(UIController(argc, argv)) {
                 // Add dummy particles and joints
-                point_manager.addParticle(physics::Particle<float>(
-                    physics::Particle<float>::Point(50, 50), // Position
-                    physics::Particle<float>::Vector(1, 2) // Velocity
-                ));
-                point_manager.addParticle(physics::Particle<float>(
-                    physics::Particle<float>::Point(100, 200), // Position
-                    physics::Particle<float>::Vector(1, 2) // Velocity
-                ));
-                point_manager.addJoint(physics::Joint<float>(
-                    point_manager.getParticles()[0],
-                    point_manager.getParticles()[1]
-                ));
+
+                // bad tower
+                earthquake_system.create_joint(50, 0, 50, 50);
+                earthquake_system.create_joint(50, 50, 50, 100);
+                earthquake_system.create_joint(50, 150, 50, 100);
+                
+                earthquake_system.create_joint(100, 0, 100, 50);
+                earthquake_system.create_joint(100, 50, 100, 100);
+                earthquake_system.create_joint(100, 150, 100, 100);
+
+                earthquake_system.create_joint(50, 50, 100, 50);
+                earthquake_system.create_joint(50, 100, 100, 100);
+                earthquake_system.create_joint(50, 150, 100, 150);
+
+                // decent tower
+                earthquake_system.create_joint(250, 0, 250, 50);
+                earthquake_system.create_joint(250, 50, 250, 100);
+                earthquake_system.create_joint(250, 150, 250, 100);
+                
+                earthquake_system.create_joint(300, 0, 300, 50);
+                earthquake_system.create_joint(300, 50, 300, 100);
+                earthquake_system.create_joint(300, 150, 300, 100);
+
+                earthquake_system.create_joint(250, 50, 300, 50);
+                earthquake_system.create_joint(250, 100, 300, 100);
+                earthquake_system.create_joint(250, 150, 300, 150);
+
+                earthquake_system.create_joint(250, 0, 300, 50);
+                earthquake_system.create_joint(250, 50, 300, 100);
+                earthquake_system.create_joint(250, 100, 300, 150);
 
                 main_loop();
             }
@@ -147,7 +163,7 @@ namespace game {
                         a = b;
                         update_game_state();
                     }
-                    ui_controller.render(point_manager.getParticles(), point_manager.getJoints());
+                    ui_controller.render(earthquake_system.particles(), earthquake_system.joints());
                     glfwPollEvents();
                     
                 }
@@ -156,10 +172,10 @@ namespace game {
             // Called every 1/FPS seconds
             void update_game_state(){
                 // Update particles and joints
-                point_manager.update();
+                earthquake_system.update();
             }
 
-            ParticleJointManager<float> point_manager;
+            EarthquakeSystem<float> earthquake_system;
             UIController ui_controller;
     };
 }
