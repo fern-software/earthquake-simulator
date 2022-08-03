@@ -17,7 +17,11 @@ public:
 	ParticleSystem(unsigned int width, unsigned int height, T gravity_x, T gravity_y): 
 		width_(width),
 		height_(height),
-		gravity_(Vector(gravity_x, gravity_y)){}
+		gravity_(Vector(gravity_x, gravity_y))
+	{
+		particles_.reserve(width * height);
+		joints_.reserve(width * height);
+	}
 
 	// Returns the particle at the given position if it exists. Returns nullptr if it does not.
 	// If two exist at the given position then it returns the first one that is found.
