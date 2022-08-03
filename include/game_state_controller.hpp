@@ -117,9 +117,14 @@ namespace game {
             // Create at particle system and initialize openGL window
             GameStateController(int argc, char* argv[]): particle_system(physics::ParticleSystem<float>(WIDTH, HEIGHT, 0, -1)), ui_controller(UIController(argc, argv)) {
                 // Add dummy particles and joints
-                particle_system.create_particle(50, 50);
-                particle_system.create_particle(100, 200);
+                particle_system.create_particle(50, 50, false);
+                particle_system.create_particle(100, 200, false);
+                particle_system.create_particle(50, 100, false);
+                particle_system.create_particle(100, 100, true);
                 particle_system.create_joint(50, 50, 100, 200);
+                particle_system.create_joint(50, 50, 50, 100);
+                particle_system.create_joint(50, 100, 100, 200);
+                particle_system.create_joint(50, 100, 100, 100);
 
                 main_loop();
             }

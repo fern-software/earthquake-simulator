@@ -31,8 +31,16 @@ public:
 		T diff = (distance - length_) / distance;
 
 		// updates the position of the particles
-		p1_.pos_ += delta * 0.5 * diff;
-		p2_.pos_ -= delta * 0.5 * diff;
+		if(p1_.fixed() && !p2_.fixed()){
+			p2_.pos_ -= delta * 0.5 * diff;
+		}
+		else if(p2_.fixed() && !p1_.fixed()){
+			p1_.pos_ += delta * 0.5 * diff;
+		}
+		else if(!p1_.fixed() && !p2_.fixed()){
+			p1_.pos_ += delta * 0.5 * diff;
+			p2_.pos_ -= delta * 0.5 * diff;
+		}
 	}
 
 	T x1() const {

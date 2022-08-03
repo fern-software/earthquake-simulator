@@ -31,8 +31,8 @@ public:
 
 	// Creates a new particle at the given position subject to the system's gravity and returns a
 	// reference to it.
-	Particle<T>& create_particle(T x, T y) {
-		particles_.push_back(Particle<T>(x, y, width_, height_, gravity_));
+	Particle<T>& create_particle(T x, T y, bool fixed) {
+		particles_.push_back(Particle<T>(x, y, fixed, width_, height_, gravity_));
 		return particles_.back();
 	}
 
@@ -42,27 +42,28 @@ public:
 	void create_joint(T x1, T y1, T x2, T y2){
 		Particle<T>* p1 = particle_at(x1, y1);
 		if(!p1){
-			p1 = &create_particle(x1, y1);
+			p1 = &create_particle(x1, y1, false);
 		}
 		
 		Particle<T>* p2 = particle_at(x2, y2);
 		if(!p2){
-			p2 = &create_particle(x2, y2);
+			p2 = &create_particle(x2, y2, false);
 		}
 
 		joints_.push_back(Joint(*p1, *p2));
 	}
 
-	// TODO: implement
-	void update() {
+	// Updates the simulation by a given timestep dt.
+	void update(T dt){
 		// updates positions of all particles as effected by gravity
 		for(auto& particle : particles_){
-			particle.update(0.5f);
+			particle.update(dt);
 		}
 
 		// relaxation loop
 		// the number of iterations used partly determines the accuracy of the simulation
-		// less iterations results in the joints behaving less like rigid bodies
+		// less iterations results in the joints behaving less like rigid bodies and more like
+		// springs
 		for(int i = 0; i < 10; ++i){
 			for(auto& joint : joints_){
 				joint.maintain_length();
@@ -95,4 +96,5 @@ private:
 	std::vector<Particle<T>> particles_;
 	std::vector<Joint<T>> joints_;
 };
+
 }

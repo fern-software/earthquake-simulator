@@ -15,15 +15,20 @@ public:
 	using Vector = CGAL::Vector_2<CGAL::Cartesian<T>>;
 	
 	// Constructs a particle at the given position which is subjet to the given acceleration.
-	Particle(T x, T y, unsigned int system_width, unsigned int system_height, Vector a) :
+	Particle(T x, T y, bool fixed, unsigned int system_width, unsigned int system_height, Vector a) :
 		pos_(Point(x, y)),
 		prev_pos_(Point(x, y)),
 		a_(a),
 		system_width_(system_width),
-		system_height_(system_height){}
+		system_height_(system_height),
+		fixed_(fixed){}
 
 	// Updates the position of the particle using Verlet Integration.
 	void update(T dt){
+		if(fixed_){
+			return;
+		}
+
 		Point tmp = pos_;
 		pos_ += (pos_ - prev_pos_) + (a_ * dt * dt);
 		prev_pos_ = tmp;
@@ -50,6 +55,10 @@ public:
 		}
 	}
 
+	bool fixed() const {
+		return fixed_;
+	}
+
 	T x() const {
 		return pos_.x();
 	}
@@ -65,6 +74,7 @@ private:
 	Vector a_;
 	unsigned int system_width_;
 	unsigned int system_height_;
+	bool fixed_;
 };
 
 }
