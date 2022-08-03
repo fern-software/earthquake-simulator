@@ -21,12 +21,13 @@ public:
 	}
 
 	// Creates a particle in the system. If the particle is on the ground (ie: y = 0), then it is
-	// fixed. Returns a reference to the particle created.
+	// fixed. Returns a reference to the particle created. If the particle is already in the system
+	// then it is not added again and reference to that particle is returned.
 	physics::Particle<T>& create_particle(T x, T y){
-		if (!system_.particle_at(x, y)) {
-			return system_.create_particle(x, y, y < 20 ? true : false);
+		if (!particle_at(x, y)) {
+			return system_.create_particle(x, y, y == 0 ? true : false);
 		}
-		return *system_.particle_at(x, y);
+		return *particle_at(x, y);
 	}
 
 	// Creates a joint in the system between two particles. If particles do not exist at the given
@@ -59,7 +60,7 @@ public:
 	void shake_ground(){
 		for(auto& particle : system_.particles()){
 			if(particle.fixed()){
-				particle.move(std::sin(run_time_), 0);
+				particle.move(2 * std::sin(run_time_), 0);
 			}
 		}
 	}
