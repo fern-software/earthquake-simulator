@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <list>
+#include <cassert>
 
 #include "particle_system.hpp"
 #include "particle.hpp"
@@ -12,12 +13,27 @@ namespace game {
 // Represents a ParticleSystem specific to an earthquake simulation.
 template <typename T> class EarthquakeSystem {
 public:
+	// the upper boundary of the magnitude of the system (lower bound is 0)
+	static const int MAGNITUDE_UPPER_BOUND = 9;
+
 	// Creates a new EarthquakeSystem with the given width, height, *realistic* gravity and an
 	// inital ground level which particles position's may not go below.
-	EarthquakeSystem(unsigned int width, unsigned int height, int init_ground_level = 40) :
+	EarthquakeSystem(
+		unsigned int width,
+		unsigned int height,
+		unsigned int magnitude_x = 1,
+		unsigned int magnitude_y = 1,
+		int init_ground_level = 40
+	) :
 		run_time_(0),
 		ground_dx_(0),
-		system_(physics::ParticleSystem<T>(0, width, init_ground_level, height, 0, -1)){}
+		magnitude_x_(magnitude_x),
+		magnitude_y_(magnitude_y),
+		system_(physics::ParticleSystem<T>(0, width, init_ground_level, height, 0, -1))
+	{
+		assert(magnitude_x_ <= MAGNITUDE_UPPER_BOUND);
+		assert(magnitude_y_ <= MAGNITUDE_UPPER_BOUND);
+	}
 
 	physics::Particle<T>* particle_at(T x, T y){
 		return system_.particle_at(x, y);
@@ -52,7 +68,7 @@ public:
 
 	// Updates the simulation by one timestep.
 	void update(){
-		run_time_ += 0.25;
+		run_time_ += 0.1;
 
 		shake_ground();
 		system_.update(0.1);
@@ -62,8 +78,8 @@ public:
 	// This creates a shaking effect over subsequent calls. Also moves the ground up and down if
 	// the vertical magnitude of the earthquake is greater than 0.
 	void shake_ground(){
-		T dx = std::sin(run_time_ * 1.3); // TODO: make this change depending on horizontal magnitude
-		T dy = std::sin(run_time_ * 5); // TODO: make this change depending on vertical magnitude
+		T dx = magnitude_x_ * 1.6 * std::sin(run_time_ * 1.3 * magnitude_x_);
+		T dy = magnitude_y_ * 1.1 * std::sin(run_time_ * 1.4 * magnitude_y_);
 
 		// update bounding box of system
 		system_.move_lower_bound(0, dy);
@@ -98,8 +114,32 @@ public:
 		return system_.bounding_box().ymin();
 	}
 
+	// Increments magnitude_x_ by delta then makes sure that the magnitude is within
+	// [0, MAGNITUDE_UPPER_BOUND].
+	void inc_magnitude_x(int delta){
+		if(magnitude_x_ + delta <= MAGNITUDE_UPPER_BOUND){
+			magnitude_x_ += delta;
+		}
+	}
+
+	// Increments magnitude_y_ by delta then makes sure that the magnitude is within
+	// [0, magitude_upper_bound].
+	void inc_magnitude_y(int delta){
+		if(magnitude_y_ + delta <= MAGNITUDE_UPPER_BOUND){
+			magnitude_y_ += delta;
+		}
+	}
+
 	T ground_dx(){
 		return ground_dx_;
+	}
+
+	unsigned int magnitude_x(){
+		return magnitude_x_;
+	}
+
+	unsigned int magnitude_y(){
+		return magnitude_y_;
 	}
 
 private:
@@ -108,6 +148,12 @@ private:
 
 	// the amount to the left of the right the ground has moved
 	T ground_dx_;
+
+	// horizontal magnitude of earthquake
+	unsigned int magnitude_x_;
+
+	// vertical magnitude of earthquake
+	unsigned int magnitude_y_;
 
 	// underlying particle system
 	physics::ParticleSystem<T> system_;
