@@ -9,7 +9,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 # set standard
 set(CMAKE_CXX_STANDARD 20)
 
-# coverage, testing, and sanitizer options
+# coverage, and sanitizer options
 include(Sanitizers)
 
 option(ENABLE_COVERAGE, "This enables coverage information provided by Lcov" false)
@@ -19,6 +19,7 @@ if (ENABLE_COVERAGE)
 	APPEND_COVERAGE_COMPILER_FLAGS()
 endif()
 
+# required packages
 find_package(Catch2 REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
@@ -26,12 +27,11 @@ find_package(glfw3 REQUIRED)
 find_package(Cairo REQUIRED)
 find_package(PkgConfig REQUIRED)
 find_package(Pango REQUIRED)
-pkg_check_modules(GLIB REQUIRED glib-2.0)
 
+pkg_check_modules(GLIB REQUIRED glib-2.0)
 pkg_check_modules(GTK2 REQUIRED gtk+-2.0)
 
 include_directories(${OPENGL_INCLUDE_DIR})
-
 
 # executables
 add_executable(earth app/earthquake.cpp)
@@ -40,11 +40,8 @@ add_executable(test_earthquake app/test_earthquake.cpp)
 target_include_directories(earth PUBLIC include ${Pango_INCLUDE_DIR} ${GLIB_INCLUDE_DIRS} ${CAIRO_INCLUDE_DIRS})
 target_include_directories(test_earthquake PUBLIC include)
 
-
 target_link_libraries(earth OpenGL::GL OpenGL::GLU GLEW::GLEW glfw ${CAIRO_LIBRARIES} ${GTK2_LIBRARIES} ${GLIB_LIBRARIES} ${Pango_LIBRARY})
 target_link_libraries(test_earthquake PUBLIC Catch2::Catch2)
-
-
 
 # coverage task that runs tests
 if (ENABLE_COVERAGE)
