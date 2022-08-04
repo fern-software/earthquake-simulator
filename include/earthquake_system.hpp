@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmath>
+#include <list>
 
 #include "particle_system.hpp"
 #include "particle.hpp"
@@ -67,12 +68,12 @@ public:
 	}
 
 	// Returns a reference to the list of all particles in the system.
-	std::vector<physics::Particle<T>>& particles(){
+	std::list<physics::Particle<T>>& particles(){
 		return system_.particles();
 	}
 
 	// Returns a reference to the list of all joints in the system.
-	std::vector<physics::Joint<T>>& joints(){
+	std::list<physics::Joint<T>>& joints(){
 		return system_.joints();
 	}
 

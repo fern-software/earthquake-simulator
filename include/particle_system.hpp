@@ -1,7 +1,7 @@
 #pragma once
 
 #include <utility>
-#include <vector>
+#include <list>
 #include <stdexcept>
 
 #include "particle.hpp"
@@ -28,10 +28,7 @@ public:
 		upper_bound_(Point(upper_bound_x, upper_bound_y)),
 		bounding_box_(Rectangle(lower_bound_, upper_bound_)),
 		gravity_(Vector(gravity_x, gravity_y))
-	{
-		particles_.reserve(100);
-		joints_.reserve(100);
-	}
+	{}
 
 	// Returns the particle at the given position if it exists. Returns nullptr if it does not.
 	// If two exist at the given position then it returns the first one that is found.
@@ -83,12 +80,12 @@ public:
 	}
 
 	// Returns a reference to the list of all particles in the system.
-	std::vector<Particle<T>>& particles(){
+	std::list<Particle<T>>& particles(){
 		return particles_;
 	}
 
 	// Returns a reference to the list of all joints in the system.
-	std::vector<Joint<T>>& joints(){
+	std::list<Joint<T>>& joints(){
 		return joints_;
 	}
 
@@ -104,9 +101,14 @@ private:
 	// Constant acceleration that all particles in the system are subject to.
 	Vector gravity_;
 
-	// list of particles and joints in the system
-	std::vector<Particle<T>> particles_;
-	std::vector<Joint<T>> joints_;
+	// Lists of all particles and joints in the system.
+	// It is important that the particles and joints are stored in lists instead of vectors because
+	// std::list guarantees that references to elements are valid as long as the element that the
+	// reference points to is in the list (ie: the elements has not been erased from the list). 
+	// This program uses references to elements in these lists extensively, so even though there is
+	// a small performance hit iterating through lists compared to vectors, it is neccessary.
+	std::list<Particle<T>> particles_;
+	std::list<Joint<T>> joints_;
 };
 
 }
