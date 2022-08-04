@@ -51,7 +51,7 @@ public:
 
 	// Updates the simulation by one timestep.
 	void update(){
-		run_time_ += 0.1;
+		run_time_ += 0.25;
 
 		shake_ground();
 		system_.update(0.1);
@@ -62,10 +62,10 @@ public:
 	// the vertical magnitude of the earthquake is greater than 0.
 	void shake_ground(){
 		T dx = std::sin(run_time_ * 1.3); // TODO: make this change depending on horizontal magnitude
-		T dy = std::sin(run_time_); // TODO: make this change depending on vertical magnitude
+		T dy = std::sin(run_time_ * 5); // TODO: make this change depending on vertical magnitude
 
 		// update bounding box of system
-		system_.update_lower_bound(0, dy);
+		system_.move_lower_bound(0, dy);
 
 		// Move particles touching the ground.
 		for(auto& particle : system_.particles()){

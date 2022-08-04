@@ -17,7 +17,7 @@ public:
 	using Rectangle = CGAL::Iso_rectangle_2<CGAL::Cartesian<T>>;
 	
 	// Constructs a particle at the given position which is subjet to the given acceleration.
-	Particle(T x, T y, bool fixed, Rectangle bounding_box, Vector a) :
+	Particle(T x, T y, bool fixed, Rectangle& bounding_box, Vector a) :
 		pos_(Point(x, y)),
 		prev_pos_(Point(x, y)),
 		a_(a),
@@ -98,7 +98,7 @@ private:
 	Vector a_;
 
 	// bounding box of the system the particle is in
-	Rectangle bounding_box_;
+	Rectangle& bounding_box_;
 
 	// whether the particle is fixed to a point in space or not
 	bool fixed_;

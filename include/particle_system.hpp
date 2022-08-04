@@ -23,10 +23,8 @@ public:
 		T upper_bound_y,
 		T gravity_x,
 		T gravity_y
-	) : 
-		lower_bound_(Point(lower_bound_x, lower_bound_y)),
-		upper_bound_(Point(upper_bound_x, upper_bound_y)),
-		bounding_box_(Rectangle(lower_bound_, upper_bound_)),
+	) :
+		bounding_box_(Rectangle(Point(lower_bound_x, lower_bound_y), Point(upper_bound_x, upper_bound_y))),
 		gravity_(Vector(gravity_x, gravity_y))
 	{}
 
@@ -89,16 +87,14 @@ public:
 		return joints_;
 	}
 
-	// Updates the lower bound of the system.
-	void update_lower_bound(T dx, T dy){
-		lower_bound_ += Vector(dx, dy);
-		bounding_box_ = Rectangle(lower_bound_, upper_bound_);
+	// Moves the lower bound of the system.
+	void move_lower_bound(T dx, T dy){
+		bounding_box_ = Rectangle(bounding_box_.min() + Vector(dx, dy), bounding_box_.max());
 	}
 
-	// Updates the upper bound of the system.
-	void update_upper_bound(T dx, T dy){
-		upper_bound_ += Vector(dx, dy);
-		bounding_box_ = Rectangle(lower_bound_, upper_bound_);
+	// Moves the upper bound of the system.
+	void move_upper_bound(T dx, T dy){
+		bounding_box_ = Rectangle(bounding_box_.min(), bounding_box_.max() + Vector(dx, dy));
 	}
 
 	// Returns the bounding box of the system.
@@ -107,9 +103,6 @@ public:
 	}
 
 private:
-	Point lower_bound_;
-	Point upper_bound_;
-
 	// Actual bounding box of the system, all particles must stay within this box.
 	Rectangle bounding_box_;
 	
