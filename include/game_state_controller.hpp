@@ -164,7 +164,9 @@ namespace game {
                                          insertion_mode,
                                          insertion_mode == insertion_mode_t::JOINT ? prev_joint_particle:nullptr, // Selected Joint
                                          5, // Horizontal Shake
-                                         6); // Vertical Shake
+                                         6, // Vertical Shake
+                                         earthquake_system.ground_height(), // Ground height
+                                         earthquake_system.ground_dx()); // Ground dx
                     glfwPollEvents();
                     
                 }
