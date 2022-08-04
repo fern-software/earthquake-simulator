@@ -89,9 +89,24 @@ public:
 		return joints_;
 	}
 
+	// Updates the lower bound of the system.
+	void update_lower_bound(T dx, T dy){
+		lower_bound_ += Vector(dx, dy);
+		bounding_box_ = Rectangle(lower_bound_, upper_bound_);
+	}
+
+	// Updates the upper bound of the system.
+	void update_upper_bound(T dx, T dy){
+		upper_bound_ += Vector(dx, dy);
+		bounding_box_ = Rectangle(lower_bound_, upper_bound_);
+	}
+
+	// Returns the bounding box of the system.
+	Rectangle& bounding_box(){
+		return bounding_box_;
+	}
+
 private:
-	// Points which make up the bounding box of the system. Since the rectangle constructor
-	// takes references, we need to store these Points for the lifetime of the system.
 	Point lower_bound_;
 	Point upper_bound_;
 

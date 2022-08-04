@@ -67,6 +67,11 @@ public:
 		stay_in_bounds();
 	}
 
+	// Sets the particles position. Ignores system boundaries.
+	void set_position(T x, T y){
+		pos_ = Point(x, y);
+	}
+
 	bool fixed() const {
 		return fixed_;
 	}
