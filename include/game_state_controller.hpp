@@ -6,7 +6,6 @@
 #include <string>
 #include <exception>
 #include <chrono>
-#include <vector>
 #include "ui_controller.hpp"
 #include "earthquake_system.hpp"
 
