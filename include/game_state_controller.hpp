@@ -42,6 +42,18 @@ namespace game {
             Bbox stop_bbox = {WIDTH-30, HEIGHT-38,
                               WIDTH-5, HEIGHT-12};
 
+            Bbox horizontal_mag_up_bbox = {WIDTH-65, HEIGHT-80,
+                                           WIDTH-40, HEIGHT-60};
+
+            Bbox horizontal_mag_down_bbox = {WIDTH-30, HEIGHT-60,
+                                             WIDTH-5, HEIGHT-80};
+
+            Bbox vertical_mag_up_bbox = {WIDTH-65, HEIGHT-120,
+                                         WIDTH-40, HEIGHT-100};
+
+            Bbox vertical_mag_down_bbox = {WIDTH-30, HEIGHT-100,
+                                           WIDTH-5, HEIGHT-120};
+
             UIController(): window(nullptr) {
                 try {
                     initGLFW();
@@ -59,7 +71,9 @@ namespace game {
                         std::vector <physics::Joint<float>> joints, 
                         bool running, 
                         insertion_mode_t insertion_mode,
-                        physics::Particle<float>* selected_particle) {
+                        physics::Particle<float>* selected_particle,
+                        unsigned int horizontal_magnitude,
+                        unsigned int vertical_magnitude) {
 
                 glClearColor (0.0f, 0.0f, 0.0f, 0.0f);
                 glDisable (GL_DEPTH_TEST);
@@ -83,10 +97,10 @@ namespace game {
                             font_controller.glPrint(10, HEIGHT-30, "Inserting Joints");
                             break;
                     }
-                    font_controller.glPrint(WIDTH-180, HEIGHT-30, "Paused");
+                    font_controller.glPrint(WIDTH-180, HEIGHT-40, "Paused");
                 }
                 else {
-                    font_controller.glPrint(WIDTH-180, HEIGHT-30, "Running");
+                    font_controller.glPrint(WIDTH-180, HEIGHT-40, "Running");
                 }
 
                 // Draw Menu (Start and stop buttons) in the top right of the window
@@ -108,6 +122,40 @@ namespace game {
                     glVertex2f(stop_bbox.left, stop_bbox.top);
                     glVertex2f(stop_bbox.left, stop_bbox.btm);
                 glEnd();
+
+                // Draw magnitude buttons
+                // Horizontal adjustment
+                font_controller.glPrint(WIDTH-280, HEIGHT-80, (std::string("Horiz. Shake: ") + std::to_string(horizontal_magnitude)).c_str());
+
+                // Set color to blue
+                glColor3f(0.0f, 0.0f, 1.0f);
+                glBegin(GL_TRIANGLES);
+                    glVertex2f(horizontal_mag_up_bbox.right, horizontal_mag_up_bbox.btm);
+                    glVertex2f(horizontal_mag_up_bbox.left, horizontal_mag_up_bbox.btm);
+                    glVertex2f((horizontal_mag_up_bbox.right + horizontal_mag_up_bbox.left) / 2, horizontal_mag_up_bbox.top);
+                glEnd();
+                glBegin(GL_TRIANGLES);
+                    glVertex2f(horizontal_mag_down_bbox.right, horizontal_mag_down_bbox.btm);
+                    glVertex2f(horizontal_mag_down_bbox.left, horizontal_mag_down_bbox.btm);
+                    glVertex2f((horizontal_mag_down_bbox.right + horizontal_mag_down_bbox.left) / 2, horizontal_mag_down_bbox.top);
+                glEnd();
+
+                // Vertical adjustment
+                font_controller.glPrint(WIDTH-267, HEIGHT-120, (std::string("Vert. Shake: ") + std::to_string(vertical_magnitude)).c_str());
+
+                // Set color to blue
+                glColor3f(0.0f, 0.0f, 1.0f);
+                glBegin(GL_TRIANGLES);
+                    glVertex2f(vertical_mag_up_bbox.right, vertical_mag_up_bbox.btm);
+                    glVertex2f(vertical_mag_up_bbox.left, vertical_mag_up_bbox.btm);
+                    glVertex2f((vertical_mag_up_bbox.right + vertical_mag_up_bbox.left) / 2, vertical_mag_up_bbox.top);
+                glEnd();
+                glBegin(GL_TRIANGLES);
+                    glVertex2f(vertical_mag_down_bbox.right, vertical_mag_down_bbox.btm);
+                    glVertex2f(vertical_mag_down_bbox.left, vertical_mag_down_bbox.btm);
+                    glVertex2f((vertical_mag_down_bbox.right + vertical_mag_down_bbox.left) / 2, vertical_mag_down_bbox.top);
+                glEnd();
+
 
                 // Draw particles
                 glEnable(GL_ALPHA_TEST);
@@ -248,7 +296,27 @@ namespace game {
                         // Stop simulation
                         simulation_running = false;
                         insertion_mode = insertion_mode_t::PARTICLE;
-                    } 
+                    }
+                    // Over horizontal magnitude up
+                    else if (x <= ui_controller.horizontal_mag_up_bbox.right && x >= ui_controller.horizontal_mag_up_bbox.left &&
+                        y <= ui_controller.horizontal_mag_up_bbox.top && y >= ui_controller.horizontal_mag_up_bbox.btm) {
+                        // TODO Increase horizontal magnitude
+                    }
+                    // Over horizontal magnitude down
+                    else if (x <= ui_controller.horizontal_mag_down_bbox.right && x >= ui_controller.horizontal_mag_down_bbox.left &&
+                        y <= ui_controller.horizontal_mag_down_bbox.top && y >= ui_controller.horizontal_mag_down_bbox.btm) {
+                        // TODO Decrease horizontal magnitude
+                    }
+                    // Over vertical magnitude up
+                    else if (x <= ui_controller.vertical_mag_up_bbox.right && x >= ui_controller.vertical_mag_up_bbox.left &&
+                        y <= ui_controller.vertical_mag_up_bbox.top && y >= ui_controller.vertical_mag_up_bbox.btm) {
+                        // TODO Increase vertical magnitude
+                    }
+                    // Over vertical magnitude down
+                    else if (x <= ui_controller.vertical_mag_down_bbox.right && x >= ui_controller.vertical_mag_down_bbox.left &&
+                        y <= ui_controller.vertical_mag_down_bbox.top && y >= ui_controller.vertical_mag_down_bbox.btm) {
+                        // TODO Decrease vertical magnitude
+                    }
                     else if (!simulation_running) {
                         // Insertion mode
                         // Snap to the nearest 20th grid point
@@ -301,7 +369,9 @@ namespace game {
                                          earthquake_system.joints(), 
                                          simulation_running, // Simulation state
                                          insertion_mode,
-                                         insertion_mode == insertion_mode_t::JOINT ? prev_joint_particle:nullptr); // Insertion mode
+                                         insertion_mode == insertion_mode_t::JOINT ? prev_joint_particle:nullptr, // Selected Joint
+                                         5, // Horizontal Shake
+                                         6); // Vertical Shake
                     glfwPollEvents();
                     
                 }
