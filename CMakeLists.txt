@@ -10,12 +10,12 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 set(CMAKE_CXX_STANDARD 20)
 
 # coverage, testing, and sanitizer options
-include(Sanitizers.cmake)
+include(Sanitizers)
 
 option(ENABLE_COVERAGE, "This enables coverage information provided by Lcov" false)
 if (ENABLE_COVERAGE)
 	set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Set the build type." FORCE)
-	include(CodeCoverage.cmake)
+	include(CodeCoverage)
 	APPEND_COVERAGE_COMPILER_FLAGS()
 endif()
 
