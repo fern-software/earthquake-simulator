@@ -61,7 +61,7 @@ public:
 	// This creates a shaking effect over subsequent calls.
 	void shake_ground(){
 		for(auto& particle : system_.particles()){
-			if(particle.fixed()){
+			if(particle.y() == 40){
 				particle.move(2 * std::sin(run_time_), 0);
 			}
 		}
