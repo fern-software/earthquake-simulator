@@ -16,6 +16,7 @@ public:
 	// inital ground level which particles position's may not go below.
 	EarthquakeSystem(unsigned int width, unsigned int height, int init_ground_level = 40) :
 		run_time_(0),
+		ground_dx_(0),
 		system_(physics::ParticleSystem<T>(0, width, init_ground_level, height, 0, -1)){}
 
 	physics::Particle<T>* particle_at(T x, T y){
@@ -67,10 +68,13 @@ public:
 		// update bounding box of system
 		system_.move_lower_bound(0, dy);
 
+		// update ground position
+		ground_dx_ += dx;
+
 		// Move particles touching the ground.
+		// Do to floating point inaccuracies, we need to update fixed particles differently.
 		for(auto& particle : system_.particles()){
 			if(particle.fixed()){
-				// To stay fixed to exactly the ground, we need to always set to bounding box min y.
 				particle.set_position(particle.x() + dx, system_.bounding_box().ymin());
 			}
 			else if(particle.y() <= system_.bounding_box().ymin()){
@@ -89,9 +93,21 @@ public:
 		return system_.joints();
 	}
 
+	// Returns the current height of the ground.
+	T ground_height(){
+		return system_.bounding_box().ymin();
+	}
+
+	T ground_dx(){
+		return ground_dx_;
+	}
+
 private:
 	// total time system has been running
 	T run_time_;
+
+	// the amount to the left of the right the ground has moved
+	T ground_dx_;
 
 	// underlying particle system
 	physics::ParticleSystem<T> system_;
