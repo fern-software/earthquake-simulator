@@ -20,7 +20,6 @@ if (ENABLE_COVERAGE)
 endif()
 
 find_package(Catch2 REQUIRED)
-find_package(Boost REQUIRED COMPONENTS graph)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(glfw3 REQUIRED)
@@ -38,11 +37,11 @@ include_directories(${OPENGL_INCLUDE_DIR})
 add_executable(earth app/earthquake.cpp)
 add_executable(test_earthquake app/test_earthquake.cpp)
 
-target_include_directories(earth PUBLIC ${Boost_INCLUDE_DIRS} include ${Pango_INCLUDE_DIR} ${GLIB_INCLUDE_DIRS} ${CAIRO_INCLUDE_DIRS})
-target_include_directories(test_earthquake PUBLIC ${Boost_INCLUDE_DIRS} include)
+target_include_directories(earth PUBLIC include ${Pango_INCLUDE_DIR} ${GLIB_INCLUDE_DIRS} ${CAIRO_INCLUDE_DIRS})
+target_include_directories(test_earthquake PUBLIC include)
 
 
-target_link_libraries(earth Boost::graph OpenGL::GL OpenGL::GLU GLEW::GLEW glfw ${CAIRO_LIBRARIES} ${GTK2_LIBRARIES} ${GLIB_LIBRARIES} ${Pango_LIBRARY})
+target_link_libraries(earth OpenGL::GL OpenGL::GLU GLEW::GLEW glfw ${CAIRO_LIBRARIES} ${GTK2_LIBRARIES} ${GLIB_LIBRARIES} ${Pango_LIBRARY})
 target_link_libraries(test_earthquake PUBLIC Catch2::Catch2)
 
 
