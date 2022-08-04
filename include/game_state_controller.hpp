@@ -6,8 +6,8 @@
 #include <string>
 #include <exception>
 #include <chrono>
-#include <vector>
 #include "ui_controller.hpp"
+#include <list>
 #include "earthquake_system.hpp"
 
 
