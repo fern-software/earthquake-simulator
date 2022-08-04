@@ -8,7 +8,7 @@
 #include <string>
 #include <exception>
 #include <chrono>
-#include <vector>
+#include <list>
 #include "font_controller.hpp"
 #include "earthquake_system.hpp"
 
@@ -55,8 +55,8 @@ namespace game {
                 glfwTerminate();
             }
 
-            void render(std::vector<physics::Particle<float>> particles, 
-                        std::vector <physics::Joint<float>> joints, 
+            void render(std::list<physics::Particle<float>> particles, 
+                        std::list <physics::Joint<float>> joints, 
                         bool running, 
                         insertion_mode_t insertion_mode,
                         physics::Particle<float>* selected_particle) {

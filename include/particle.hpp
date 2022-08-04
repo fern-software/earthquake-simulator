@@ -3,6 +3,7 @@
 #include <CGAL/Cartesian.h>
 #include <CGAL/Point_2.h>
 #include <CGAL/Vector_2.h>
+#include <CGAL/Iso_rectangle_2.h>
 
 namespace physics {
 
@@ -13,14 +14,14 @@ template <class T> class Particle {
 public:
 	using Point = CGAL::Point_2<CGAL::Cartesian<T>>;
 	using Vector = CGAL::Vector_2<CGAL::Cartesian<T>>;
+	using Rectangle = CGAL::Iso_rectangle_2<CGAL::Cartesian<T>>;
 	
 	// Constructs a particle at the given position which is subjet to the given acceleration.
-	Particle(T x, T y, bool fixed, unsigned int system_width, unsigned int system_height, Vector a) :
+	Particle(T x, T y, bool fixed, Rectangle& bounding_box, Vector a) :
 		pos_(Point(x, y)),
 		prev_pos_(Point(x, y)),
 		a_(a),
-		system_width_(system_width),
-		system_height_(system_height),
+		bounding_box_(bounding_box),
 		fixed_(fixed){}
 
 	bool operator==(const Particle& other) const {
@@ -40,22 +41,22 @@ public:
 		stay_in_bounds();
 	}
 
-	// Makes sure that the particle is within ([0, width], [0, height])
+	// Makes sure that the particle is within boundaries of the system.
 	void stay_in_bounds(){
 		// check x boudaries
-		if(pos_.x() < 0){
-			pos_ = Point(0, pos_.y());
+		if(pos_.x() < bounding_box_.xmin()){
+			pos_ = Point(bounding_box_.xmin(), pos_.y());
 		}
-		else if(pos_.x() > system_width_){
-			pos_ = Point(system_width_, pos_.y());
+		else if(pos_.x() > bounding_box_.xmax()){
+			pos_ = Point(bounding_box_.xmax(), pos_.y());
 		}
 
 		// check y boundaries
-		if(pos_.y() < 0){
-			pos_ = Point(pos_.x(), 0);
+		if(pos_.y() < bounding_box_.ymin()){
+			pos_ = Point(pos_.x(), bounding_box_.ymin());
 		}
-		else if(pos_.y() > system_height_){
-			pos_ = Point(pos_.x(), system_height_);
+		else if(pos_.y() > bounding_box_.ymax()){
+			pos_ = Point(pos_.x(), bounding_box_.ymax());
 		}
 	}
 
@@ -64,6 +65,11 @@ public:
 	void move(T dx, T dy){
 		pos_ += Vector(dx, dy);
 		stay_in_bounds();
+	}
+
+	// Sets the particles position. Ignores system boundaries.
+	void set_position(T x, T y){
+		pos_ = Point(x, y);
 	}
 
 	bool fixed() const {
@@ -91,9 +97,8 @@ private:
 	// constant accleration the particle is subject to
 	Vector a_;
 
-	// width and height of the system the particle is in
-	unsigned int system_width_;
-	unsigned int system_height_;
+	// bounding box of the system the particle is in
+	Rectangle& bounding_box_;
 
 	// whether the particle is fixed to a point in space or not
 	bool fixed_;
