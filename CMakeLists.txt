@@ -53,3 +53,9 @@ if (ENABLE_COVERAGE)
 		DEPENDENCIES test_earthquake
 	)
 endif()
+
+# install the program
+install(TARGETS earth DESTINATION bin)
+
+# install the demo script
+install(PROGRAMS demo DESTINATION bin)
