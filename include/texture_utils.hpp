@@ -27,7 +27,6 @@ namespace texture_utils {
                      GL_UNSIGNED_BYTE,
                      pixels);
 
-        // glGenerateMipmap(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, 0);
         return texture_id;
     }

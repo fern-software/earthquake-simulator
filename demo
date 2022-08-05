@@ -1,0 +1,7 @@
+#! /usr/bin/env bash
+
+# Get the directory in which the currently running script is located.
+cmd_dir=$(dirname "$0") || panic "cannot determine command directory"
+
+# Run the program.
+$cmd_dir/earth

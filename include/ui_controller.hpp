@@ -137,7 +137,7 @@ namespace game {
 
                 // Draw magnitude buttons
                 // Horizontal adjustment
-                 glColor3f(1.f, 1.0f, 1.0f);
+                glColor3f(1.f, 1.0f, 1.0f);
                 font_controller.glPrint(WIDTH-280, HEIGHT-80, (std::string("Horiz. Shake: ") + std::to_string(horizontal_magnitude)).c_str());
 
                 // Set color to blue
@@ -172,7 +172,7 @@ namespace game {
 
                 // Draw ground
                 glColor3f(1.0f, 1.0f, 1.0f);
-                texture_utils::draw_texture(0, 0, ground_texture_info, WIDTH + ground_dx, ground_height);
+                texture_utils::draw_texture(0, 0, ground_texture_info, WIDTH + ground_dx + 100, ground_height);
 
                 // Draw particles
                 glEnable(GL_ALPHA_TEST);
