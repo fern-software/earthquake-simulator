@@ -19,6 +19,7 @@ namespace game {
     #define WIDTH 640
     #define HEIGHT 480
     #define FPS 60
+    #define INIT_GROUND_LEVEL 40
 
     enum class insertion_mode_t {
         PARTICLE,
@@ -101,12 +102,14 @@ namespace game {
                     glBegin(GL_LINES);
                     glColor4f(0.33f, 0.2f, 0.33f, 0.25f);
 
+                    // vertical lines
                     for (int i = 0; i < WIDTH; i += 20) {
                         glVertex2f(i, 0);
                         glVertex2f(i, HEIGHT);
                     }
 
-                    for (int i = 0; i < HEIGHT; i += 20) {
+                    // horizontal lines
+                    for (float i = ground_height; i < HEIGHT; i += 20) {
                         glVertex2f(0, i);
                         glVertex2f(WIDTH, i);
                     }

@@ -21,9 +21,9 @@ public:
 	EarthquakeSystem(
 		unsigned int width,
 		unsigned int height,
+		unsigned int init_ground_level,
 		unsigned int magnitude_x = 1,
-		unsigned int magnitude_y = 1,
-		int init_ground_level = 40
+		unsigned int magnitude_y = 1
 	) :
 		run_time_(0),
 		ground_dx_(0),
@@ -35,7 +35,7 @@ public:
 		assert(magnitude_y_ <= MAGNITUDE_UPPER_BOUND);
 	}
 
-	physics::Particle<T>* particle_near(T x, T y, T radius = 1) {
+	physics::Particle<T>* particle_near(T x, T y, T radius = 1){
 		return system_.particle_near(x, y, radius);
 	}
 

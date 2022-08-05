@@ -78,13 +78,15 @@ namespace game {
                     }
                     else if (!simulation_running) {
                         // Insertion mode
-                        // Snap to the nearest 20x20 grid point
-                        if(x % 20 < 10)  x -= x % 20;
-                        else             x += 20 - x % 20;
-                        if(y % 20 < 10)  y -= y % 20;
-                        else             y += 20 - y % 20;
-
                         Particle* p = earthquake_system.particle_near(x, y, 10);
+
+                        // Snap to the nearest 20x20 grid point from the ground up
+                        int y_snap = static_cast<int>(earthquake_system.ground_height()) - INIT_GROUND_LEVEL;
+                        if(x % 20 < 10)             x -= x % 20;
+                        else                        x += 20 - x % 20;
+                        if((y - y_snap) % 20 < 10)  y -= (y - y_snap) % 20;
+                        else                        y += 20 - (y - y_snap) % 20;
+
                         switch(insertion_mode){
                             case insertion_mode_t::PARTICLE:
                                 if (!p) {
@@ -176,5 +178,5 @@ namespace game {
     bool GameStateController::simulation_running = false;
     UIController GameStateController::ui_controller = UIController();
     FontController UIController::font_controller = FontController();
-    EarthquakeSystem<float> GameStateController::earthquake_system = EarthquakeSystem<float>(WIDTH, HEIGHT);
+    EarthquakeSystem<float> GameStateController::earthquake_system = EarthquakeSystem<float>(WIDTH, HEIGHT, INIT_GROUND_LEVEL);
 }
