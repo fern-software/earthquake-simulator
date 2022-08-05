@@ -26,6 +26,10 @@ public:
 		p2_ = other.p2_;
 		length_ = other.length_;
 	}
+
+	bool operator==(const Joint& other) const {
+		return (p1_ == other.p1_ && p2_ == other.p2_) || (p1_ == other.p2_ && p2_ == other.p1_);
+	}
 	
 	// Maintains the length of the joint by moving the two particles closer or farther apart
 	// depending on the current distance between them. Depending on the number of joints
