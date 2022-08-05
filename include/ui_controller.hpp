@@ -54,8 +54,7 @@ namespace game {
                     
 
                 } catch (std::exception& e) {
-                    std::cout << "Failed to initialize OpenGL" << std::endl;
-                    exit(1);
+                    throw std::runtime_error("Failed to initialize OpenGL");
                 }
             }
 
