@@ -79,7 +79,8 @@ namespace game {
                         unsigned int horizontal_magnitude,
                         unsigned int vertical_magnitude,
                         float ground_height,
-                        float ground_dx) {
+                        float ground_dx,
+                        std::string timer) {
 
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);             
                 glMatrixMode(GL_PROJECTION);
@@ -128,12 +129,13 @@ namespace game {
                     }
                     font_controller.glPrint(WIDTH-180, HEIGHT-40, "Paused");
                 }
-                else {
-                    font_controller.glPrint(WIDTH-180, HEIGHT-40, "Running");
+
+                // Draw Menu (Start, stop, timer) in the top right of the window
+                if (running) {
+                    glColor3f(1.0f, 1.0f, 1.0f);
+                    font_controller.glPrint(WIDTH-200, HEIGHT-40, timer.c_str());
                 }
-
-                // Draw Menu (Start and stop buttons) in the top right of the window
-
+                
                 // Set color to green
                 glColor3f(0.0f, 1.0f, 0.0f);
                 // Draw start button
