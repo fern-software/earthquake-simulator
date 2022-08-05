@@ -35,7 +35,7 @@ public:
 		assert(magnitude_y_ <= MAGNITUDE_UPPER_BOUND);
 	}
 
-	physics::Particle<T>* particle_near(T x, T y, T radius = 1) {
+	physics::Particle<T>* particle_near(T x, T y, T radius = 1){
 		return system_.particle_near(x, y, radius);
 	}
 
