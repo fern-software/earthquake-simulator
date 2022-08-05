@@ -99,10 +99,35 @@ namespace game {
                 glOrtho(0.f, width, 0.f, height, 0.f, 1.f);
                 glMatrixMode(GL_MODELVIEW);
                 glLoadIdentity();
+                glEnable(GL_ALPHA_TEST);
+                glAlphaFunc(GL_NOTEQUAL, 0);
 
                 // Draw Sky
                 glColor3f(1.0f, 1.0f, 1.0f);
                 texture_utils::draw_texture(0, 0, sky_texture_info, WIDTH, HEIGHT);
+
+                // Draw a grid where the user can place particles if the simulation is not running
+                if (!running){
+                    glEnable(GL_BLEND);
+                    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+                    glBegin(GL_LINES);
+                    glColor4f(0.33f, 0.2f, 0.33f, 0.25f);
+
+                    for (int i = 0; i < WIDTH; i += 20) {
+                        glVertex2f(i, 0);
+                        glVertex2f(i, HEIGHT);
+                    }
+
+                    for (int i = 0; i < HEIGHT; i += 20) {
+                        glVertex2f(0, i);
+                        glVertex2f(WIDTH, i);
+                    }
+                    glEnd();
+
+                    glBlendFunc(GL_NONE, GL_NONE);
+                    glDisable(GL_BLEND);
+                }
 
                 // Print current editor mode if the simulation is not running
                 glColor3f(1.f, 1.0f, 1.0f);
@@ -181,8 +206,6 @@ namespace game {
                 texture_utils::draw_texture(0, 0, ground_texture_info, WIDTH + ground_dx + 100, ground_height);
 
                 // Draw particles
-                glEnable(GL_ALPHA_TEST);
-                glAlphaFunc(GL_NOTEQUAL, 0);
                 glEnable(GL_BLEND);
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                 glEnable( GL_POINT_SMOOTH );
