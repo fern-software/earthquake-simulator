@@ -80,9 +80,9 @@ namespace game {
                         // Insertion mode
                         // Snap to the nearest 20x20 grid point
                         if(x % 20 < 10)  x -= x % 20;
-                        else            x += 20 - x % 20;
+                        else             x += 20 - x % 20;
                         if(y % 20 < 10)  y -= y % 20;
-                        else            y += 20 - y % 20;
+                        else             y += 20 - y % 20;
 
                         Particle* p = earthquake_system.particle_near(x, y, 10);
                         switch(insertion_mode){
@@ -130,6 +130,10 @@ namespace game {
                     if(delta_time >= update_rate) {
                         a = b;
                         update_game_state();
+                    }
+                    // If simulation state goes from stopped to running, invalidate the selected joint particle
+                    if (prev_joint_particle && simulation_running) {
+                        prev_joint_particle = nullptr;
                     }
                     ui_controller.render(earthquake_system.particles(), 
                                          earthquake_system.joints(), 

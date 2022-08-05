@@ -199,7 +199,7 @@ namespace game {
 
                 glBegin(GL_POINTS);
                 for (auto& particle : particles) {
-                    if(!running && selected_particle && particle == *selected_particle) {
+                    if(selected_particle && particle == *selected_particle) {
                         glColor3f(0.0f, 1.0f, 0.0f);
                     }
                     else {
