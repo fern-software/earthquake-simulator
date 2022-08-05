@@ -82,10 +82,10 @@ namespace game {
 
                         // Snap to the nearest 20x20 grid point from the ground up
                         int y_snap = static_cast<int>(earthquake_system.ground_height()) - INIT_GROUND_LEVEL;
-                        if(x % 20 < 10)  x -= x % 20;
-                        else             x += 20 - x % 20;
+                        if(x % 20 < 10)             x -= x % 20;
+                        else                        x += 20 - x % 20;
                         if((y - y_snap) % 20 < 10)  y -= (y - y_snap) % 20;
-                        else             y += 20 - (y - y_snap) % 20;
+                        else                        y += 20 - (y - y_snap) % 20;
 
                         switch(insertion_mode){
                             case insertion_mode_t::PARTICLE:
