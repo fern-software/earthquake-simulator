@@ -81,19 +81,12 @@ namespace game {
                         float ground_height,
                         float ground_dx) {
 
-                glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-                glDisable (GL_DEPTH_TEST);
-                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-                int width, height;
-                glfwGetFramebufferSize(window, &width, &height);
-                glViewport(0, 0, width, height);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);             
                 glMatrixMode(GL_PROJECTION);
                 glLoadIdentity();
-                glOrtho(0.f, width, 0.f, height, 0.f, 1.f);
+                glOrtho(0.f, WIDTH, 0.f, HEIGHT, 0.f, 1.f);
                 glMatrixMode(GL_MODELVIEW);
                 glLoadIdentity();
-                glEnable(GL_ALPHA_TEST);
-                glAlphaFunc(GL_NOTEQUAL, 0);
 
                 // Draw Sky
                 glColor3f(1.0f, 1.0f, 1.0f);
@@ -178,7 +171,7 @@ namespace game {
                 glEnd();
 
                 // Vertical adjustment
-                 glColor3f(1.f, 1.0f, 1.0f);
+                glColor3f(1.f, 1.0f, 1.0f);
                 font_controller.glPrint(WIDTH-267, HEIGHT-120, (std::string("Vert. Shake: ") + std::to_string(vertical_magnitude)).c_str());
 
                 // Set color to blue
@@ -242,6 +235,9 @@ namespace game {
                 }
 
                 glfwMakeContextCurrent(window);
+                glViewport(0, 0, WIDTH, HEIGHT);
+                glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+                glDisable(GL_DEPTH_TEST);
             }
 
             // Should close the window?

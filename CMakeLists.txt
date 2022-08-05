@@ -19,6 +19,12 @@ if (ENABLE_COVERAGE)
 	APPEND_COVERAGE_COMPILER_FLAGS()
 endif()
 
+option(ENABLE_PROFILING, "This enables profiling information provided by GProf" false)
+if (ENABLE_PROFILING)
+	set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Set the build type." FORCE)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg -gdwarf-3")
+endif()
+
 # required packages
 find_package(Catch2 REQUIRED)
 find_package(OpenGL REQUIRED)

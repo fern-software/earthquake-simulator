@@ -111,6 +111,7 @@ namespace game {
             }
             
         private:
+            const long update_rate = 1000 / FPS;
 
             // Calls update_game_state every 1/FPS seconds
             // Calls render as often as possible
@@ -119,7 +120,7 @@ namespace game {
                 while (!ui_controller.shouldClose()) {
                     auto b = std::chrono::high_resolution_clock::now();
                     auto delta_time = std::chrono::duration_cast<std::chrono::milliseconds>(b - a).count();
-                    if(delta_time >= 1000 / FPS) {
+                    if(delta_time >= update_rate) {
                         a = b;
                         update_game_state();
                     }
@@ -127,7 +128,7 @@ namespace game {
                                          earthquake_system.joints(), 
                                          simulation_running, // Simulation state
                                          insertion_mode,
-                                         insertion_mode == insertion_mode_t::JOINT ? prev_joint_particle:nullptr, // Selected Joint
+                                         insertion_mode == insertion_mode_t::JOINT ? prev_joint_particle : nullptr, // Selected Joint
                                          earthquake_system.magnitude_x(), // Horizontal shake
                                          earthquake_system.magnitude_y(), // Vertical shake
                                          earthquake_system.ground_height(), // Ground height
