@@ -1,6 +1,34 @@
 # Earthquake Simulator
 SENG 475 Final project by Owen Jaques and Finn Morin.
 
+## Building, Installing, and Running
+To build and install the software, simply execute the commands below. Let `$TOP_DIR` denote the top-level directory of the project software and let
+`$INSTALL_DIR` denote the directory into which the software is to be installed.
+
+```
+cd $TOP_DIR
+cmake -H. -Bbuild -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR -DCMAKE_BUILD_TYPE=Release
+cmake --build build --clean-first --target install
+```
+
+To run a demonstration of the installed program execute the following command:
+
+```
+$INSTALL_DIR/bin/demo
+```
+
+### Development Build Commands
+While developing it is often useful to build the software with address sanitizers and undefined behaviour sanitizers. It is also often useful to
+build with debugging flags so the program can be used in a debugger. To build the program with those enabled execute the commands below.
+
+```
+cd $TOP_DIR
+cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Debug -DENABLE_ASAN=true -DENABLE_UBSAN=true
+cmake --build build
+```
+
+This will create the program `earth` in the `$TOP_DIR/build` directory.
+
 ## Physics System
 This project uses 'ragdoll physics' to simulate the shaking, falling, and general movement of whatever the user chooses to create on the screen.
 
