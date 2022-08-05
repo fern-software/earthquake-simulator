@@ -35,6 +35,7 @@ namespace game {
                 int right;
                 int top;
             };
+
             Bbox start_bbox = {WIDTH-55, HEIGHT-40,
                                WIDTH-40, HEIGHT-10};
 
@@ -56,6 +57,17 @@ namespace game {
             UIController(): window(nullptr) {
                 try {
                     initGLFW();
+                    // Load ground and sky textures
+                    // Try different folders
+                    try {
+                        ground_texture_info = texture_utils::load_texture("../resources/brick.texture", 480, 200);
+                        sky_texture_info = texture_utils::load_texture("../resources/sky.texture", 640, 480);
+                    } catch(...) {
+                        ground_texture_info = texture_utils::load_texture("resources/brick.texture", 480, 200);
+                        sky_texture_info = texture_utils::load_texture("../resources/sky.texture", 640, 480);
+                    }
+                    
+
                 } catch (std::exception& e) {
                     std::cout << "Failed to initialize OpenGL" << std::endl;
                     exit(1);
@@ -67,14 +79,16 @@ namespace game {
             }
 
             void render(std::list<physics::Particle<float>> particles, 
-                        std::list <physics::Joint<float>> joints, 
+                        std::list<physics::Joint<float>> joints, 
                         bool running, 
                         insertion_mode_t insertion_mode,
                         physics::Particle<float>* selected_particle,
                         unsigned int horizontal_magnitude,
-                        unsigned int vertical_magnitude) {
+                        unsigned int vertical_magnitude,
+                        float ground_height,
+                        float ground_dx) {
 
-                glClearColor (0.0f, 0.0f, 0.0f, 0.0f);
+                glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
                 glDisable (GL_DEPTH_TEST);
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 int width, height;
@@ -86,7 +100,12 @@ namespace game {
                 glMatrixMode(GL_MODELVIEW);
                 glLoadIdentity();
 
+                // Draw Sky
+                glColor3f(1.0f, 1.0f, 1.0f);
+                texture_utils::draw_texture(0, 0, sky_texture_info, WIDTH, HEIGHT);
+
                 // Print current editor mode if the simulation is not running
+                glColor3f(1.f, 1.0f, 1.0f);
                 if (!running) {
                     switch(insertion_mode) {
                         case insertion_mode_t::PARTICLE:
@@ -124,6 +143,7 @@ namespace game {
 
                 // Draw magnitude buttons
                 // Horizontal adjustment
+                glColor3f(1.f, 1.0f, 1.0f);
                 font_controller.glPrint(WIDTH-280, HEIGHT-80, (std::string("Horiz. Shake: ") + std::to_string(horizontal_magnitude)).c_str());
 
                 // Set color to blue
@@ -140,6 +160,7 @@ namespace game {
                 glEnd();
 
                 // Vertical adjustment
+                 glColor3f(1.f, 1.0f, 1.0f);
                 font_controller.glPrint(WIDTH-267, HEIGHT-120, (std::string("Vert. Shake: ") + std::to_string(vertical_magnitude)).c_str());
 
                 // Set color to blue
@@ -155,6 +176,9 @@ namespace game {
                     glVertex2f((vertical_mag_down_bbox.right + vertical_mag_down_bbox.left) / 2, vertical_mag_down_bbox.top);
                 glEnd();
 
+                // Draw ground
+                glColor3f(1.0f, 1.0f, 1.0f);
+                texture_utils::draw_texture(0, 0, ground_texture_info, WIDTH + ground_dx + 100, ground_height);
 
                 // Draw particles
                 glEnable(GL_ALPHA_TEST);
@@ -215,6 +239,8 @@ namespace game {
 
         private:
             static FontController font_controller;
+            texture_utils::texture_info_t ground_texture_info;
+            texture_utils::texture_info_t sky_texture_info;
             
     };
 }
