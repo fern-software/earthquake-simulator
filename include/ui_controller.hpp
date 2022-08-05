@@ -57,12 +57,14 @@ namespace game {
             UIController(): window(nullptr) {
                 try {
                     initGLFW();
-                    // Load ground texture
+                    // Load ground and sky textures
                     // Try different folders
                     try {
                         ground_texture_info = texture_utils::load_texture("../resources/brick.texture", 480, 200);
+                        sky_texture_info = texture_utils::load_texture("../resources/sky.texture", 640, 480);
                     } catch(...) {
                         ground_texture_info = texture_utils::load_texture("resources/brick.texture", 480, 200);
+                        sky_texture_info = texture_utils::load_texture("../resources/sky.texture", 640, 480);
                     }
                     
 
@@ -97,6 +99,10 @@ namespace game {
                 glOrtho(0.f, width, 0.f, height, 0.f, 1.f);
                 glMatrixMode(GL_MODELVIEW);
                 glLoadIdentity();
+
+                // Draw Sky
+                glColor3f(1.0f, 1.0f, 1.0f);
+                texture_utils::draw_texture(0, 0, sky_texture_info, WIDTH, HEIGHT);
 
                 // Print current editor mode if the simulation is not running
                 glColor3f(1.f, 1.0f, 1.0f);
@@ -234,6 +240,7 @@ namespace game {
         private:
             static FontController font_controller;
             texture_utils::texture_info_t ground_texture_info;
+            texture_utils::texture_info_t sky_texture_info;
             
     };
 }

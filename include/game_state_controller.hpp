@@ -25,37 +25,6 @@ namespace game {
                 glfwSetErrorCallback(error_callback);
                 glfwSetKeyCallback(ui_controller.window, key_callback);
                 glfwSetMouseButtonCallback(ui_controller.window, mouse_button_callback);
-                // Add dummy particles and joints
-
-                // bad tower
-                // earthquake_system.create_joint(50, 0, 50, 50);
-                // earthquake_system.create_joint(50, 50, 50, 100);
-                // earthquake_system.create_joint(50, 150, 50, 100);
-                
-                // earthquake_system.create_joint(100, 0, 100, 50);
-                // earthquake_system.create_joint(100, 50, 100, 100);
-                // earthquake_system.create_joint(100, 150, 100, 100);
-
-                // earthquake_system.create_joint(50, 50, 100, 50);
-                // earthquake_system.create_joint(50, 100, 100, 100);
-                // earthquake_system.create_joint(50, 150, 100, 150);
-
-                // // decent tower
-                // earthquake_system.create_joint(250, 0, 250, 50);
-                // earthquake_system.create_joint(250, 50, 250, 100);
-                // earthquake_system.create_joint(250, 150, 250, 100);
-                
-                // earthquake_system.create_joint(300, 0, 300, 50);
-                // earthquake_system.create_joint(300, 50, 300, 100);
-                // earthquake_system.create_joint(300, 150, 300, 100);
-
-                // earthquake_system.create_joint(250, 50, 300, 50);
-                // earthquake_system.create_joint(250, 100, 300, 100);
-                // earthquake_system.create_joint(250, 150, 300, 150);
-
-                // earthquake_system.create_joint(250, 0, 300, 50);
-                // earthquake_system.create_joint(250, 50, 300, 100);
-                // earthquake_system.create_joint(250, 100, 300, 150);
 
                 main_loop();
             }
