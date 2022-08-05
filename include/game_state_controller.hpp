@@ -119,12 +119,15 @@ namespace game {
             }
             
         private:
-            const long update_rate = 1000 / FPS;
+            constexpr static long update_rate = 1000 / FPS;
 
             // Calls update_game_state every 1/FPS seconds
             // Calls render as often as possible
             void main_loop() {
-                auto a = std::chrono::high_resolution_clock::now();
+                auto start_time = std::chrono::high_resolution_clock::now();
+                auto a = start_time;
+                auto time_running = start_time;
+
                 while (!ui_controller.shouldClose()) {
                     auto b = std::chrono::high_resolution_clock::now();
                     auto delta_time = std::chrono::duration_cast<std::chrono::milliseconds>(b - a).count();
@@ -132,10 +135,15 @@ namespace game {
                         a = b;
                         update_game_state();
                     }
+                    // If simulation is running tick the timer
+                    if (simulation_running) {
+                        time_running += std::chrono::milliseconds(delta_time);
+                    }
                     // If simulation state goes from stopped to running, invalidate the selected joint particle
                     if (prev_joint_particle && simulation_running) {
                         prev_joint_particle = nullptr;
                     }
+
                     ui_controller.render(earthquake_system.particles(), 
                                          earthquake_system.joints(), 
                                          simulation_running, // Simulation state
@@ -144,7 +152,9 @@ namespace game {
                                          earthquake_system.magnitude_x(), // Horizontal shake
                                          earthquake_system.magnitude_y(), // Vertical shake
                                          earthquake_system.ground_height(), // Ground height
-                                         earthquake_system.ground_dx()); // Ground dx
+                                         earthquake_system.ground_dx(), // Ground dx
+                                         std::string("Time: ") + std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(time_running - start_time).count() / 1000) + "s" // Timer string
+                                         ); 
 
                     glfwPollEvents();
                     
