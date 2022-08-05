@@ -87,6 +87,10 @@ public:
 		return pos_.y();
 	}
 
+	Point pos() const {
+		return pos_;
+	}
+
 private:
 	// Joints need to be able to directly modify the position of particles
 	template <class U> friend class Joint;
