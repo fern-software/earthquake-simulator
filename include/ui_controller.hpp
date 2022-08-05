@@ -7,6 +7,7 @@
 #include <string>
 #include <exception>
 #include <list>
+#include <CGAL/Bbox_2.h>
 
 #include "font_controller.hpp"
 #include "particle.hpp"
@@ -23,36 +24,20 @@ namespace game {
         JOINT
     };
 
+    using Bbox = CGAL::Bbox_2;
+
     // Handles all OpenGL functionality
     // Does not handle text. See FontController for that.
     class UIController {
         public:
             GLFWwindow* window;
 
-            struct Bbox {
-                int left;
-                int btm;
-                int right;
-                int top;
-            };
-
-            Bbox start_bbox = {WIDTH-55, HEIGHT-40,
-                               WIDTH-40, HEIGHT-10};
-
-            Bbox stop_bbox = {WIDTH-30, HEIGHT-38,
-                              WIDTH-5, HEIGHT-12};
-
-            Bbox horizontal_mag_up_bbox = {WIDTH-65, HEIGHT-80,
-                                           WIDTH-40, HEIGHT-60};
-
-            Bbox horizontal_mag_down_bbox = {WIDTH-30, HEIGHT-60,
-                                             WIDTH-5, HEIGHT-80};
-
-            Bbox vertical_mag_up_bbox = {WIDTH-65, HEIGHT-120,
-                                         WIDTH-40, HEIGHT-100};
-
-            Bbox vertical_mag_down_bbox = {WIDTH-30, HEIGHT-100,
-                                           WIDTH-5, HEIGHT-120};
+            Bbox start_bbox(WIDTH-55, HEIGHT-40, WIDTH-40, HEIGHT-10);
+            Bbox stop_bbox(WIDTH-30, HEIGHT-38, WIDTH-5, HEIGHT-12);
+            Bbox horizontal_mag_up_bbox(WIDTH-65, HEIGHT-80, WIDTH-40, HEIGHT-60);
+            Bbox horizontal_mag_down_bbox(WIDTH-30, HEIGHT-60, WIDTH-5, HEIGHT-80);
+            Bbox vertical_mag_up_bbox(WIDTH-65, HEIGHT-120, WIDTH-40, HEIGHT-100);
+            Bbox vertical_mag_down_bbox(WIDTH-30, HEIGHT-100, WIDTH-5, HEIGHT-120);
 
             UIController(): window(nullptr) {
                 try {
@@ -218,12 +203,8 @@ namespace game {
             void initGLFW() {
                 if (!glfwInit())
                     throw std::runtime_error("Failed to initialize GLFW");
-                
-                int major, minor, rev;
-                glfwGetVersion(&major, &minor, &rev);
-                std::cout << "glfw major.minor " << major << "." << minor << "." << rev << std::endl;
-
-                window = glfwCreateWindow(WIDTH, HEIGHT, "Hello World", NULL, NULL);
+                window = glfwCreateWindow(WIDTH, HEIGHT, "Earthquake Simulator", NULL, NULL);
+                glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
                 if (!window) {
                     glfwTerminate();
                     throw std::runtime_error("Failed to create window");
