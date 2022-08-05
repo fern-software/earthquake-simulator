@@ -35,18 +35,18 @@ public:
 		assert(magnitude_y_ <= MAGNITUDE_UPPER_BOUND);
 	}
 
-	physics::Particle<T>* particle_at(T x, T y){
-		return system_.particle_at(x, y);
+	physics::Particle<T>* particle_near(T x, T y, T radius = 1) {
+		return system_.particle_near(x, y, radius);
 	}
 
 	// Creates a particle in the system. If the particle is on the ground (ie: y = 0), then it is
 	// fixed. Returns a reference to the particle created. If the particle is already in the system
 	// then it is not added again and reference to that particle is returned.
 	physics::Particle<T>& create_particle(T x, T y){
-		if(!particle_at(x, y)){
+		if(!system_.particle_at(x, y)){
 			return system_.create_particle(x, y, y <= ground_height() ? true : false);
 		}
-		return *particle_at(x, y);
+		return *system_.particle_at(x, y);
 	}
 
 	// Creates a joint in the system between two particles. If particles do not exist at the given
@@ -62,11 +62,10 @@ public:
 		if(!p2){
 			p2 = &create_particle(x2, y2);
 		}
-		// A joint cannot have both ends at the same particle
-		if(p1 == p2){
-			return;
-		}
-		system_.create_joint(*p1, *p2);
+		try {
+			system_.create_joint(*p1, *p2);
+		} catch(...){}
+		
 	}
 
 	// Updates the simulation by one timestep.

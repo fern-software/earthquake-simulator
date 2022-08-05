@@ -13,9 +13,10 @@
 
 namespace game {
     class GameStateController {
+        using Particle = physics::Particle<float>;
         public:
             static insertion_mode_t insertion_mode;
-            static physics::Particle<float>* prev_joint_particle;
+            static Particle* prev_joint_particle;
             static bool simulation_running;
             static EarthquakeSystem<float> earthquake_system;
             static UIController ui_controller;
@@ -77,25 +78,31 @@ namespace game {
                     }
                     else if (!simulation_running) {
                         // Insertion mode
-                        // Snap to the nearest 20th grid point
-                        if(x % 20 < 5)  x -= x % 20;
-                        else            x += 20 - x % 20;
-                        if(y % 20 < 5)  y -= y % 20;
-                        else            y += 20 - y % 20;
+                        // Snap to the nearest 20x20 grid point
+                        if(x % 20 < 10)  x -= x % 20;
+                        else             x += 20 - x % 20;
+                        if(y % 20 < 10)  y -= y % 20;
+                        else             y += 20 - y % 20;
 
+                        Particle* p = earthquake_system.particle_near(x, y, 10);
                         switch(insertion_mode){
                             case insertion_mode_t::PARTICLE:
-                                if (!earthquake_system.particle_at(x, y)) {
+                                if (!p) {
                                     prev_joint_particle = &earthquake_system.create_particle(x, y);
                                 }
                                 // We selected an existing particle, enter joint mode
                                 else {
                                     insertion_mode = insertion_mode_t::JOINT;
-                                    prev_joint_particle = earthquake_system.particle_at(x, y);
+                                    prev_joint_particle = p;
                                 }
                                 break;
                             case insertion_mode_t::JOINT:
-                                earthquake_system.create_joint(prev_joint_particle->x(), prev_joint_particle->y(), x, y);
+                                if (p) {
+                                    earthquake_system.create_joint(prev_joint_particle->x(), prev_joint_particle->y(), p->x(), p->y());
+                                }
+                                else {
+                                    earthquake_system.create_joint(prev_joint_particle->x(), prev_joint_particle->y(), x, y);
+                                }
                                 insertion_mode = insertion_mode_t::PARTICLE;
                                 prev_joint_particle = nullptr;
                                 break;
@@ -111,6 +118,7 @@ namespace game {
             }
             
         private:
+            const long update_rate = 1000 / FPS;
 
             // Calls update_game_state every 1/FPS seconds
             // Calls render as often as possible
@@ -119,15 +127,19 @@ namespace game {
                 while (!ui_controller.shouldClose()) {
                     auto b = std::chrono::high_resolution_clock::now();
                     auto delta_time = std::chrono::duration_cast<std::chrono::milliseconds>(b - a).count();
-                    if(delta_time >= 1000 / FPS) {
+                    if(delta_time >= update_rate) {
                         a = b;
                         update_game_state();
+                    }
+                    // If simulation state goes from stopped to running, invalidate the selected joint particle
+                    if (prev_joint_particle && simulation_running) {
+                        prev_joint_particle = nullptr;
                     }
                     ui_controller.render(earthquake_system.particles(), 
                                          earthquake_system.joints(), 
                                          simulation_running, // Simulation state
                                          insertion_mode,
-                                         insertion_mode == insertion_mode_t::JOINT ? prev_joint_particle:nullptr, // Selected Joint
+                                         insertion_mode == insertion_mode_t::JOINT ? prev_joint_particle : nullptr, // Selected Joint
                                          earthquake_system.magnitude_x(), // Horizontal shake
                                          earthquake_system.magnitude_y(), // Vertical shake
                                          earthquake_system.ground_height(), // Ground height

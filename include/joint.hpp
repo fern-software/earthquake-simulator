@@ -18,6 +18,9 @@ public:
 	// Constructs a joint between the given particles. The length of the joint is set to
 	// the distance between the two particles at the time of creation.
 	Joint(ParticleType p1, ParticleType p2) : p1_(p1), p2_(p2){
+		if(p1 == p2) {
+			throw std::invalid_argument("Joint cannot be created between a particle and itself.");
+		}
 		length_ = std::sqrt((p1.pos_ - p2.pos_).squared_length());
 	}
 

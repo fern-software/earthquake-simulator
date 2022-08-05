@@ -28,16 +28,34 @@ public:
 		gravity_(Vector(gravity_x, gravity_y))
 	{}
 
+	// Returns the particle nearest the given position if it exists within the given radius. Returns nullptr otherwise.
+	// Preconditions: x, y must be representable as exact values or results are undefined.
+	Particle<T>* particle_near(T x, T y, T radius = 1){
+		// Find a particle with a euclidian distance of less than radius from the given position.
+		Point target_pos(x, y);
+		T min_dist = radius;
+		Particle<T>* closest_particle = nullptr;
+		for(auto& p : particles_) {
+			Point pos = p.pos();
+			Vector vec = pos - target_pos;
+			T dist = vec.squared_length();
+			if(dist < (min_dist * min_dist)) {
+				closest_particle = &p;
+				min_dist = dist;
+			}
+		}
+		return closest_particle;
+	}
+
 	// Returns the particle at the given position if it exists. Returns nullptr if it does not.
 	// If two exist at the given position then it returns the first one that is found.
 	// Preconditions: x, y must be representable as exact values or results are undefined.
 	Particle<T>* particle_at(T x, T y){
 		for(auto& p : particles_) {
-			if(p.x() == x && p.y() == y) {
+			if(p.x() == x && p.y() == y){
 				return &p;
 			}
 		}
-
 		return nullptr;
 	}
 
