@@ -22,7 +22,10 @@ public:
 		prev_pos_(Point(x, y)),
 		a_(a),
 		bounding_box_(bounding_box),
-		fixed_(fixed){}
+		fixed_(fixed)
+	{
+		stay_in_bounds();
+	}
 
 	bool operator==(const Particle& other) const {
 		return pos_ == other.pos_;

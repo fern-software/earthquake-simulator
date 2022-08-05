@@ -44,7 +44,7 @@ public:
 	// then it is not added again and reference to that particle is returned.
 	physics::Particle<T>& create_particle(T x, T y){
 		if(!particle_at(x, y)){
-			return system_.create_particle(x, y, y == 40 ? true : false);
+			return system_.create_particle(x, y, y <= ground_height() ? true : false);
 		}
 		return *particle_at(x, y);
 	}
