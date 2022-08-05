@@ -48,35 +48,31 @@ namespace game {
                     int x = (int)xpos;
                     int y = HEIGHT - (int)ypos; // Y starts from top, we want it from bottom
 
+                    Point pos(x, y);
+
                     // Check if we're over a button
-                    if (x <= ui_controller.start_bbox.right && x >= ui_controller.start_bbox.left &&
-                        y <= ui_controller.start_bbox.top && y >= ui_controller.start_bbox.btm) {
+                    if (ui_controller.start_bbox.has_on_bounded_side(pos)) {
                         // Start simulation
                         simulation_running = true;
-                    } else if (x <= ui_controller.stop_bbox.right && x >= ui_controller.stop_bbox.left &&
-                        y <= ui_controller.stop_bbox.top && y >= ui_controller.stop_bbox.btm) {
+                    } else if (ui_controller.stop_bbox.has_on_bounded_side(pos)) {
                         // Stop simulation
                         simulation_running = false;
                         insertion_mode = insertion_mode_t::PARTICLE;
                     }
                     // Over horizontal magnitude up
-                    else if (x <= ui_controller.horizontal_mag_up_bbox.right && x >= ui_controller.horizontal_mag_up_bbox.left &&
-                        y <= ui_controller.horizontal_mag_up_bbox.top && y >= ui_controller.horizontal_mag_up_bbox.btm) {
+                    else if (ui_controller.horizontal_mag_up_bbox.has_on_bounded_side(pos)) {
                         earthquake_system.inc_magnitude_x(1);
                     }
                     // Over horizontal magnitude down
-                    else if (x <= ui_controller.horizontal_mag_down_bbox.right && x >= ui_controller.horizontal_mag_down_bbox.left &&
-                        y >= ui_controller.horizontal_mag_down_bbox.top && y <= ui_controller.horizontal_mag_down_bbox.btm) {
+                    else if (ui_controller.horizontal_mag_down_bbox.has_on_bounded_side(pos)) {
                         earthquake_system.inc_magnitude_x(-1);
                     }
                     // Over vertical magnitude up
-                    else if (x <= ui_controller.vertical_mag_up_bbox.right && x >= ui_controller.vertical_mag_up_bbox.left &&
-                        y <= ui_controller.vertical_mag_up_bbox.top && y >= ui_controller.vertical_mag_up_bbox.btm) {
+                    else if (ui_controller.vertical_mag_up_bbox.has_on_bounded_side(pos)) {
                         earthquake_system.inc_magnitude_y(1);
                     }
                     // Over vertical magnitude down
-                    else if (x <= ui_controller.vertical_mag_down_bbox.right && x >= ui_controller.vertical_mag_down_bbox.left &&
-                        y >= ui_controller.vertical_mag_down_bbox.top && y <= ui_controller.vertical_mag_down_bbox.btm) {
+                    else if (ui_controller.vertical_mag_down_bbox.has_on_bounded_side(pos)) {
                         earthquake_system.inc_magnitude_y(-1);
                     }
                     else if (!simulation_running) {
