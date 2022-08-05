@@ -62,7 +62,10 @@ public:
 		if(!p2){
 			p2 = &create_particle(x2, y2);
 		}
-
+		// A joint cannot have both ends at the same particle
+		if(p1 == p2){
+			return;
+		}
 		system_.create_joint(*p1, *p2);
 	}
 
