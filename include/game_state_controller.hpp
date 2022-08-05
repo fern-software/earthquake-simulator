@@ -78,11 +78,12 @@ namespace game {
                     }
                     else if (!simulation_running) {
                         // Insertion mode
-                        // Snap to the nearest 20x20 grid point
+                        // Snap to the nearest 20x20 grid point from the ground up
+                        int y_snap = static_cast<int>(earthquake_system.ground_height()) - 40;
                         if(x % 20 < 10)  x -= x % 20;
                         else             x += 20 - x % 20;
-                        if(y % 20 < 10)  y -= y % 20;
-                        else             y += 20 - y % 20;
+                        if((y - y_snap) % 20 < 10)  y -= (y - y_snap) % 20;
+                        else             y += 20 - (y - y_snap) % 20;
 
                         Particle* p = earthquake_system.particle_near(x, y, 10);
                         switch(insertion_mode){
