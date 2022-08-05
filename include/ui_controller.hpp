@@ -19,6 +19,7 @@ namespace game {
     #define WIDTH 640
     #define HEIGHT 480
     #define FPS 60
+    #define INIT_GROUND_LEVEL 40
 
     enum class insertion_mode_t {
         PARTICLE,
