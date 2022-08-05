@@ -49,7 +49,7 @@ namespace game {
                         sky_texture_info = texture_utils::load_texture("../resources/sky.texture", 640, 480);
                     } catch(...) {
                         ground_texture_info = texture_utils::load_texture("resources/brick.texture", 480, 200);
-                        sky_texture_info = texture_utils::load_texture("../resources/sky.texture", 640, 480);
+                        sky_texture_info = texture_utils::load_texture("resources/sky.texture", 640, 480);
                     }
                     
 
