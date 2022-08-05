@@ -55,10 +55,26 @@ The other set of components contain all earthquake specific physics and is compo
 The class contains an instance of the `ParticleSystem` class which it configures with values specific to our earthquake simulation and which it uses
 for all the underlying ragdoll physics.
 
-## Credit
-Rendering text is painful in OpenGL, and even worse on UVic's OpenGL 2.1 (released 2004). Because of this we could not get Qt 3 (Also released 2004)
-to work and had to resort to other UI libraries. We settled on Cairo and Pango for rendering text as the libraries are shockingly up to date on the
-UVic systems (both ~2018). The code for this is based on [this tutorial](https://dthompson.us/font-rendering-in-opengl-with-pango-and-cairo.html)
+## User Interface
+The user interface is built with OpenGL (for rendering), GLFW (for window management and user input), and Pango+Cairo (for text rendering).
+
+### Textures
+To avoid dependence on 3rd party libraries textures are handled in a slightly questionable way defined below. Were this to not be for school with a specific spec we would just use the stb library.
+1.  [stb](https://github.com/nothings/stb/blob/master/stb_image.h) is used to load a PNG texture into memory
+2.  Write this to disk as a `.texture` file and quit
+3.  Read this file in the main program
+4.  Continue as normal
+
+This approach lets us use the nice parsing benefits of stb without any runtime or compiletime dependence on it.
+
+### Text Rendering
+Since OpenGL has no support for text rendering we needed a library to handle this for us. Initially we planned to use Qt for user input and text but the version installed on the UGLS lab machines (v3 - 2004) was too old and lacked enough documentation for us to get it working. Instead a combination of Pango and Cairo were used to render fonts. These libraries are shockingly up to date on the lab machines (2018) and had good documentation. The code for this is based on [this tutorial](https://dthompson.us/font-rendering-in-opengl-with-pango-and-cairo.html) which was extremely helpful for learning these libraries. While we do use some of their code for interfacing with Pango and Cairo it has been adapted for C++ and further optimized/mutilated/wrapped to meet our needs.
+
+### User Input
+User input is handled by GLFW's nice and simple mouse and keyboard callbacks. Buttons are rendered to the screen and their bounding boxes are checked when a user clicks. For placing particles the mouse snaps to a 20x20 grid to (hopefully) make the building process less error prone.
+
+## Additional Credit
+
 which is an awesome tutorial for getting this up and running. It is not a direct copy however, as it has been adapted for C++ and optimized to avoid
 many unnecessary calls to pango and cairo's APIs.
 
