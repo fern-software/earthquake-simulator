@@ -7,6 +7,8 @@
 #include <string>
 #include <exception>
 #include <list>
+#include <CGAL/Iso_rectangle_2.h>
+#include <CGAL/Point_2.h>
 
 #include "font_controller.hpp"
 #include "particle.hpp"
@@ -23,38 +25,29 @@ namespace game {
         JOINT
     };
 
+    using Bbox = CGAL::Iso_rectangle_2<CGAL::Cartesian<float>>;
+    using Point = CGAL::Point_2<CGAL::Cartesian<float>>;
+
     // Handles all OpenGL functionality
     // Does not handle text. See FontController for that.
     class UIController {
         public:
             GLFWwindow* window;
 
-            struct Bbox {
-                int left;
-                int btm;
-                int right;
-                int top;
-            };
+            Bbox start_bbox;
+            Bbox stop_bbox;
+            Bbox horizontal_mag_up_bbox;
+            Bbox horizontal_mag_down_bbox;
+            Bbox vertical_mag_up_bbox;
+            Bbox vertical_mag_down_bbox;
 
-            Bbox start_bbox = {WIDTH-55, HEIGHT-40,
-                               WIDTH-40, HEIGHT-10};
-
-            Bbox stop_bbox = {WIDTH-30, HEIGHT-38,
-                              WIDTH-5, HEIGHT-12};
-
-            Bbox horizontal_mag_up_bbox = {WIDTH-65, HEIGHT-80,
-                                           WIDTH-40, HEIGHT-60};
-
-            Bbox horizontal_mag_down_bbox = {WIDTH-30, HEIGHT-60,
-                                             WIDTH-5, HEIGHT-80};
-
-            Bbox vertical_mag_up_bbox = {WIDTH-65, HEIGHT-120,
-                                         WIDTH-40, HEIGHT-100};
-
-            Bbox vertical_mag_down_bbox = {WIDTH-30, HEIGHT-100,
-                                           WIDTH-5, HEIGHT-120};
-
-            UIController(): window(nullptr) {
+            UIController(): window(nullptr),
+                            start_bbox(Point(WIDTH-55, HEIGHT-40), Point(WIDTH-40, HEIGHT-10)),
+                            stop_bbox(Point(WIDTH-30, HEIGHT-38), Point(WIDTH-5, HEIGHT-12)),
+                            horizontal_mag_up_bbox(Point(WIDTH-65, HEIGHT-80), Point(WIDTH-40, HEIGHT-60)),
+                            horizontal_mag_down_bbox(Point(WIDTH-30, HEIGHT-60), Point(WIDTH-5, HEIGHT-80)),
+                            vertical_mag_up_bbox(Point(WIDTH-65, HEIGHT-120), Point(WIDTH-40, HEIGHT-100)),
+                            vertical_mag_down_bbox(Point(WIDTH-30, HEIGHT-100), Point(WIDTH-5, HEIGHT-120)) {
                 try {
                     initGLFW();
                     // Load ground and sky textures
@@ -64,13 +57,13 @@ namespace game {
                         sky_texture_info = texture_utils::load_texture("../resources/sky.texture", 640, 480);
                     } catch(...) {
                         ground_texture_info = texture_utils::load_texture("resources/brick.texture", 480, 200);
-                        sky_texture_info = texture_utils::load_texture("../resources/sky.texture", 640, 480);
+                        sky_texture_info = texture_utils::load_texture("resources/sky.texture", 640, 480);
                     }
                     
 
+
                 } catch (std::exception& e) {
-                    std::cout << "Failed to initialize OpenGL" << std::endl;
-                    exit(1);
+                    throw std::runtime_error("Failed to initialize OpenGL");
                 }
             }
 
@@ -125,20 +118,20 @@ namespace game {
 
                 // Set color to green
                 glColor3f(0.0f, 1.0f, 0.0f);
-                // Draw start button (small 45 degree rotated triangle)
+                // Draw start button
                 glBegin(GL_TRIANGLES);
-                    glVertex2f(start_bbox.right, (start_bbox.top + start_bbox.btm)/2);
-                    glVertex2f(start_bbox.left, start_bbox.btm);
-                    glVertex2f(start_bbox.left, start_bbox.top);
+                    glVertex2f(start_bbox.xmax(), (start_bbox.ymax() + start_bbox.ymin())/2);
+                    glVertex2f(start_bbox.xmin(), start_bbox.ymin());
+                    glVertex2f(start_bbox.xmin(), start_bbox.ymax());
                 glEnd();
 
-                // Draw stop button (Small red square to the right of the start button)
+                // Draw stop button
                 glColor3f(1.0f, 0.0f, 0.0f);
                 glBegin(GL_QUADS);
-                    glVertex2f(stop_bbox.right, stop_bbox.btm);
-                    glVertex2f(stop_bbox.right, stop_bbox.top);
-                    glVertex2f(stop_bbox.left, stop_bbox.top);
-                    glVertex2f(stop_bbox.left, stop_bbox.btm);
+                    glVertex2f(stop_bbox.xmax(), stop_bbox.ymin());
+                    glVertex2f(stop_bbox.xmax(), stop_bbox.ymax());
+                    glVertex2f(stop_bbox.xmin(), stop_bbox.ymax());
+                    glVertex2f(stop_bbox.xmin(), stop_bbox.ymin());
                 glEnd();
 
                 // Draw magnitude buttons
@@ -149,14 +142,14 @@ namespace game {
                 // Set color to blue
                 glColor3f(0.0f, 0.0f, 1.0f);
                 glBegin(GL_TRIANGLES);
-                    glVertex2f(horizontal_mag_up_bbox.right, horizontal_mag_up_bbox.btm);
-                    glVertex2f(horizontal_mag_up_bbox.left, horizontal_mag_up_bbox.btm);
-                    glVertex2f((horizontal_mag_up_bbox.right + horizontal_mag_up_bbox.left) / 2, horizontal_mag_up_bbox.top);
+                    glVertex2f(horizontal_mag_up_bbox.xmax(), horizontal_mag_up_bbox.ymin());
+                    glVertex2f(horizontal_mag_up_bbox.xmin(), horizontal_mag_up_bbox.ymin());
+                    glVertex2f((horizontal_mag_up_bbox.xmax() + horizontal_mag_up_bbox.xmin()) / 2, horizontal_mag_up_bbox.ymax());
                 glEnd();
                 glBegin(GL_TRIANGLES);
-                    glVertex2f(horizontal_mag_down_bbox.right, horizontal_mag_down_bbox.btm);
-                    glVertex2f(horizontal_mag_down_bbox.left, horizontal_mag_down_bbox.btm);
-                    glVertex2f((horizontal_mag_down_bbox.right + horizontal_mag_down_bbox.left) / 2, horizontal_mag_down_bbox.top);
+                    glVertex2f(horizontal_mag_down_bbox.xmax(), horizontal_mag_down_bbox.ymax());
+                    glVertex2f(horizontal_mag_down_bbox.xmin(), horizontal_mag_down_bbox.ymax());
+                    glVertex2f((horizontal_mag_down_bbox.xmax() + horizontal_mag_down_bbox.xmin()) / 2, horizontal_mag_down_bbox.ymin());
                 glEnd();
 
                 // Vertical adjustment
@@ -166,14 +159,14 @@ namespace game {
                 // Set color to blue
                 glColor3f(0.0f, 0.0f, 1.0f);
                 glBegin(GL_TRIANGLES);
-                    glVertex2f(vertical_mag_up_bbox.right, vertical_mag_up_bbox.btm);
-                    glVertex2f(vertical_mag_up_bbox.left, vertical_mag_up_bbox.btm);
-                    glVertex2f((vertical_mag_up_bbox.right + vertical_mag_up_bbox.left) / 2, vertical_mag_up_bbox.top);
+                    glVertex2f(vertical_mag_up_bbox.xmax(), vertical_mag_up_bbox.ymin());
+                    glVertex2f(vertical_mag_up_bbox.xmin(), vertical_mag_up_bbox.ymin());
+                    glVertex2f((vertical_mag_up_bbox.xmax() + vertical_mag_up_bbox.xmin()) / 2, vertical_mag_up_bbox.ymax());
                 glEnd();
                 glBegin(GL_TRIANGLES);
-                    glVertex2f(vertical_mag_down_bbox.right, vertical_mag_down_bbox.btm);
-                    glVertex2f(vertical_mag_down_bbox.left, vertical_mag_down_bbox.btm);
-                    glVertex2f((vertical_mag_down_bbox.right + vertical_mag_down_bbox.left) / 2, vertical_mag_down_bbox.top);
+                    glVertex2f(vertical_mag_down_bbox.xmax(), vertical_mag_down_bbox.ymax());
+                    glVertex2f(vertical_mag_down_bbox.xmin(), vertical_mag_down_bbox.ymax());
+                    glVertex2f((vertical_mag_down_bbox.xmax() + vertical_mag_down_bbox.xmin()) / 2, vertical_mag_down_bbox.ymin());
                 glEnd();
 
                 // Draw ground
@@ -190,7 +183,7 @@ namespace game {
 
                 glBegin(GL_POINTS);
                 for (auto& particle : particles) {
-                    if(selected_particle && particle == *selected_particle) {
+                    if(running && selected_particle && particle == *selected_particle) {
                         glColor3f(0.0f, 1.0f, 0.0f);
                     }
                     else {
@@ -218,12 +211,8 @@ namespace game {
             void initGLFW() {
                 if (!glfwInit())
                     throw std::runtime_error("Failed to initialize GLFW");
-                
-                int major, minor, rev;
-                glfwGetVersion(&major, &minor, &rev);
-                std::cout << "glfw major.minor " << major << "." << minor << "." << rev << std::endl;
-
-                window = glfwCreateWindow(WIDTH, HEIGHT, "Hello World", NULL, NULL);
+                window = glfwCreateWindow(WIDTH, HEIGHT, "Earthquake Simulator", NULL, NULL);
+                glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
                 if (!window) {
                     glfwTerminate();
                     throw std::runtime_error("Failed to create window");
