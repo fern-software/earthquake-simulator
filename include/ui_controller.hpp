@@ -58,7 +58,13 @@ namespace game {
                 try {
                     initGLFW();
                     // Load ground texture
-                    ground_texture_info = texture_utils::load_texture("../brick.png");
+                    // Try different folders
+                    try {
+                        ground_texture_info = texture_utils::load_texture("../resources/brick.texture", 480, 200);
+                    } catch(...) {
+                        ground_texture_info = texture_utils::load_texture("resources/brick.texture", 480, 200);
+                    }
+                    
 
                 } catch (std::exception& e) {
                     std::cout << "Failed to initialize OpenGL" << std::endl;

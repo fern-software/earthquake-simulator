@@ -1,8 +1,6 @@
 #include <GL/glew.h>
 #include <GL/glu.h>
 #include <GLFW/glfw3.h>
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
 
 namespace texture_utils {
     struct texture_info_t {
@@ -44,11 +42,6 @@ namespace texture_utils {
         glBindTexture(GL_TEXTURE_2D, texture.id);
         glEnable(GL_TEXTURE_2D);
         glPushMatrix();
-
-        // glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-        // glEnableVertexAttribArray(2);  
-        
-        
         glBegin(GL_QUADS);
             glTexCoord2i(0, 0); glVertex2i(x, y_top);
             glTexCoord2i(0, 1); glVertex2i(x, y);
@@ -61,19 +54,28 @@ namespace texture_utils {
     }
 
     // Load a texture from a file and return a texture_info_t
-    texture_info_t load_texture(const char *filename) {
+    texture_info_t load_texture(const char *filename, int width = 0, int height = 0) {
         unsigned int texture_id;
-        unsigned char *pixels;
-        int width, height, channels;
+        int channels;
 
-        // Read file into pixels
-        pixels = stbi_load(filename, &width, &height, &channels, 0); //TODO: remove use of stbi
+        // Read texture from disk
+        FILE *fp = fopen(filename, "r");
+        if (fp == NULL) {
+            throw std::runtime_error("Could not open texture file");
+        }
+        fseek(fp , 0 , SEEK_END);
+        int size = ftell(fp);
+        unsigned char *pixels = (unsigned char*)malloc(sizeof(unsigned char) * size);
+        rewind(fp);
+        fread(pixels, sizeof(unsigned char), size, fp);
+        fclose(fp);
+
         if (!pixels) {
             throw std::runtime_error("Failed to load texture");
         }
 
         texture_id = create_texture(width, height, pixels, GL_RGB);
-        stbi_image_free(pixels);
+        free(pixels);
         return {texture_id, width, height};
     }
 }
