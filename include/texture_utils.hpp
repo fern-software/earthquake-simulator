@@ -55,7 +55,6 @@ namespace texture_utils {
     // Load a texture from a file and return a texture_info_t
     texture_info_t load_texture(const char *filename, int width = 0, int height = 0) {
         unsigned int texture_id;
-        int channels;
 
         // Read texture from disk
         FILE *fp = fopen(filename, "r");
