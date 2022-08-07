@@ -6,9 +6,7 @@ Users first start in the build stage where they can place particles then connect
 starts. While the simulation is running or beforehand they are free to change the vertical and horizontal magnitude of the earthquake using the
 buttons provided. They can pause the simulation at any time using the stop button to construct new stuctures or add to their existing ones.
 
-![fun earthquake simulation image](/img/lol.gif)
-
-TODO - update this image with a new one showing 30s of usage
+![30 seconds of usage gif](/img/30s_usage.gif)
 
 ## Building, Installing, and Running
 All the software for this project is designed to be built and run on UVic's UGLS machines using the SENG475
