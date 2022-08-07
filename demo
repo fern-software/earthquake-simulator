@@ -4,4 +4,4 @@
 cmd_dir=$(dirname "$0") || panic "cannot determine command directory"
 
 # Run the program.
-$cmd_dir/earth
+$cmd_dir/earth &
