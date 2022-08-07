@@ -17,7 +17,6 @@ that UGLS9 and UGLS17 worked properly but were much slower running our program.
 ### Dependencies
 This project uses these dependencies which are all found on the UGLS machines.
 
-- Catch2 (v2.13.9)
 - OpenGL (v2.1)
 - GLEW (v1.10.0)
 - glfw3 (v3.2)
