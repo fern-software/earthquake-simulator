@@ -1,7 +1,19 @@
 #! /usr/bin/env bash
 
+# Store the current directory so the script does not modify the
+# current working directory of the user
+orig_dir=$PWD
+
 # Get the directory in which the currently running script is located.
 cmd_dir=$(dirname "$0") || panic "cannot determine command directory"
 
+# The program needs to be run one up from where it is located or one
+# directory up to properly access the resource files
+cd $cmd_dir
+
 # Run the program.
-$cmd_dir/earth &
+./earth &
+
+# Restore the original working directory of the user
+cd $orig_dir
+
