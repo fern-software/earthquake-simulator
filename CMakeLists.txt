@@ -66,3 +66,7 @@ install(TARGETS earth DESTINATION bin)
 
 # install the demo script
 install(PROGRAMS demo DESTINATION bin)
+
+# install the required textures for the program
+install(DIRECTORY resources DESTINATION ${CMAKE_INSTALL_PREFIX})
+	
