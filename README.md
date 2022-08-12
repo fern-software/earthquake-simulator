@@ -1,5 +1,6 @@
 # Earthquake Simulator
-SENG 475 Final project by Owen Jaques and Finn Morin - An Earthquake Simulation using Ragdoll Physics.
+SENG 475 Final project by Owen Jaques and Finn Morin - An Earthquake Simulation using Ragdoll Physics. Click [here](https://youtu.be/MgJvDytt_M0) for
+a full video presentation of the project, including a demo.
 
 ## Usage
 Users first start in the build stage where they can place particles then connect them using joints. When they press the play button the simulation
@@ -11,8 +12,8 @@ buttons provided. They can pause the simulation at any time using the stop butto
 ## Building, Installing, and Running
 All the software for this project is designed to be built and run on UVic's UGLS machines using the SENG475
 [SDE](https://ece.engr.uvic.ca/~frodo/courses/cpp/#sde). During the the development for this project, it was found that many of those machines
-(UGLS12, UGLS26, UGLS27) lacked the dependencies neccessary to build the software. Machines that are confirmed to work properly are UGLS7, and UGLS16. We also found
-that UGLS9 and UGLS17 worked properly but were much slower running our program.
+(UGLS12, UGLS26, UGLS27) lacked the dependencies neccessary to build the software. Machines that are confirmed to work properly are UGLS7, and
+UGLS16. We also found that UGLS9 and UGLS17 worked properly but were much slower running our program.
 
 ### Dependencies
 This project uses these dependencies which are all found on the UGLS machines.
